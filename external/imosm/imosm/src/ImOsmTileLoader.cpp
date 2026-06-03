@@ -56,21 +56,6 @@ ImTextureID TileLoader::tileAt(int z, int x, int y) {
     _source->request(z, x, y);
   }
 
-  for (int fallbackZ = z - 1; fallbackZ >= 0; --fallbackZ) {
-    int fallbackX = x >> (z - fallbackZ);
-    int fallbackY = y >> (z - fallbackZ);
-    
-    const auto fallbackCond{[fallbackZ, fallbackX, fallbackY](
-                                const std::shared_ptr<ITile> &tile) {
-      return tile->isTileZXY(fallbackZ, fallbackX, fallbackY);
-    }};
-    const auto fallbackIt{
-        std::find_if(_tiles.begin(), _tiles.end(), fallbackCond)};
-    
-    if (fallbackIt != _tiles.end() && !(*fallbackIt)->isDummy()) {
-      return (*fallbackIt)->texture();
-    }
-  }
   return 0;
 }
 } // namespace ImOsm

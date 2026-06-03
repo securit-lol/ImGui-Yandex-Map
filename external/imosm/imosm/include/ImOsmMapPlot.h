@@ -110,6 +110,8 @@ private:
   SetBounds _setBounds{SetBounds::None};
 
   std::shared_ptr<ITileLoader> _loader;
+
+  void paintBackgroundTiles();
 };
 
 inline void MapPlot::resetBounds() {
