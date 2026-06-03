@@ -1,6 +1,7 @@
 #include "ImOsmDemoApp.h"
 #include <imgui_internal.h>
-#include "YandexData.h"
+#include "ImOsmMarkRenderer.h"
+#include "ImOsmMarkPanel.h"
 
 using namespace ImOsm;
 using namespace ImOsm::Rich;
@@ -8,30 +9,9 @@ using namespace ImOsm::Rich;
 ImOsmDemoApp::ImOsmDemoApp()
     : ImApp::MainWindow("ImOsm Demo Application"),
       _mapPlot{std::make_shared<RichMapPlot>()},
-      _markStorage{std::make_shared<MarkStorage>()},
-      _markEditorWidget{
-          std::make_unique<MarkEditorWidget>(_mapPlot, _markStorage)},
-      _distanceCalcWidget{std::make_unique<DistanceCalcWidget>(_markStorage)},
-      _destinationCalcWidget{
-          std::make_unique<DestinationCalcWidget>(_markStorage)},
+      
       _tileSourceWidget{std::make_unique<TileSourceWidget>(_mapPlot)},
       _tileGrabberWidget{std::make_unique<TileGrabberWidget>(_mapPlot)} {
-
-  {
-    mINI::INIStructure ini;
-    mINI::INIFile iniFile(_iniFileNameMark);
-    iniFile.read(ini);
-    _markStorage->loadState(ini);
-
-    api::GetAllStations();
-    for (const auto& __country : api::data::all_country_data) {
-            for (const auto& __region : __country.regions) {
-                for (const auto& __lement : __region.settlements) {
-                    _markEditorWidget->AddMarkCustom({ __lement.latitude, __lement.longitude},__lement.title);
-                }
-            }
-        }
-  }
   {
     mINI::INIStructure ini;
     mINI::INIFile iniFile(_iniFileNameMain);
@@ -39,16 +19,13 @@ ImOsmDemoApp::ImOsmDemoApp()
     _mapPlot->loadState(ini);
     _tileSourceWidget->loadState(ini);
     _tileGrabberWidget->loadState(ini);
+
+    _mapPlot->setBoundsGeo(ImOsm::MinLat, ImOsm::MaxLat, ImOsm::MinLon,
+                           ImOsm::MaxLon);
   }
 }
 
 ImOsmDemoApp::~ImOsmDemoApp() {
-  {
-    mINI::INIStructure ini;
-    mINI::INIFile iniFile(_iniFileNameMark);
-    _markStorage->saveState(ini);
-    iniFile.write(ini);
-  }
   {
     mINI::INIStructure ini;
     mINI::INIFile iniFile(_iniFileNameMain);
@@ -76,35 +53,11 @@ void ImOsmDemoApp::paint() {
   ImGui::Text("VIEW: lat %.2f:%.2f, lon %.2f:%.2f ", _mapPlot->minLat(),
               _mapPlot->maxLat(), _mapPlot->minLon(), _mapPlot->maxLon());
 
-  // ImGui::Text("Tiles: %d", _mapPlot.loader().tilesNum());
-
-  _worldBtn.paint();
-  if (_worldBtn.handle()) {
-    _mapPlot->setBoundsGeo(ImOsm::MinLat, ImOsm::MaxLat, ImOsm::MinLon,
-                           ImOsm::MaxLon);
-  }
-
-  ImGui::SameLine();
-  _berlinBtn.paint();
-  if (_berlinBtn.handle()) {
-    _mapPlot->setBoundsGeo(52.43, 52.59, 13.12, 13.66);
-  }
-
-  ImGui::SameLine();
-  _parisBtn.paint();
-  if (_parisBtn.handle()) {
-    _mapPlot->setBoundsGeo(49.25, 48.57, 1.12, 3.58);
-  }
-
-  ImGui::SameLine();
-  _madridBtn.paint();
-  if (_madridBtn.handle()) {
-    _mapPlot->setBoundsGeo(40.61, 40.19, -4.26, -3.10);
-  }
-
   _mapPlot->paint();
 
   ImGui::End();
+
+  ShowMarkPanel(_mapPlot);
 
   // ImGui::Begin("MarkEditor");
   // _distanceCalcWidget->paint();

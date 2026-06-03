@@ -8,6 +8,8 @@ set(CXX_CMAKE_STANDARD_REQUIRED ON)
 set(IMPROJECTEXE_SRC
     main.cpp
     ImOsmDemoApp.cpp
+    ImOsmMarkRenderer.cpp
+    ImOsmMarkPanel.cpp
 )
 
 add_executable(${PROJECT_NAME} ${IMPROJECTEXE_SRC})
