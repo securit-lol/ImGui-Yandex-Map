@@ -19,10 +19,6 @@ public:
   virtual int tileCount() const override { return _tiles.size(); }
   virtual void endLoad() override {}
 
-  const std::vector<std::shared_ptr<ITile>>& getTiles() const {
-    return _tiles;
-  }
-
 private:
   void enforceCacheLimit();
 

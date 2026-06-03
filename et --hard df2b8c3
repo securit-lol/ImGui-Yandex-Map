@@ -1,0 +1,66 @@
+[33me6eec5a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m)[m test
+[33mdf2b8c3[m fix oldest map view
+[33me2e0b38[m some fixes
+[33m239674d[m deleted unused functions,, added cached olded images, added render class
+[33m6b2c2bc[m Added Yandex Api and draw dots
+[33mf2c6c50[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m update submodule imosm
+[33mcd1b14e[m update imosm
+[33m1cc3129[m update submodule imosm
+[33m5732975[m submodule updated imosm
+[33m2dd1723[m submodule updated imosm
+[33m73378a5[m update submodule imosm
+[33mba1fecf[m rename RichMarkWidget -> RichMarkEditorWidget
+[33mc006b55[m update submodule imosm
+[33mc1fb553[m implemented ini load and save
+[33mc1b065d[m imapp submodule updated
+[33m2a3f9da[m update ImOsm submodule
+[33mf3a5a7e[m updaye submodule imosm
+[33m4ab9cbf[m update submodule ImOsm
+[33m57660f8[m update ImOsm
+[33m994f086[m change submodule URL ImOsm
+[33me7b4940[m ImOsmWidget change submodule directory name
+[33mbcc790d[m Update README.md
+[33m621e2b4[m Update README.md
+[33m8d7a6e2[m update submdoule ImOsmWidget
+[33m518d822[m CMake impr. use PROJECT_NAME variable
+[33m92e47a1[m Merge pull request #2 from gorbatschow/debug
+[33mbeac4ed[m display number of tiles stored
+[33m37b5f1a[m update submodule ImOsmWidget
+[33m709ea42[m display number of OsmTileLoader::RemoteTile
+[33ma624896[m set imosmwidget to debug branch
+[33m90aa890[m update submodule imosmwidget
+[33m817d020[m Update README.md
+[33m0b738b9[m add FPS text field
+[33m0041194[m update submodule imosmwidget
+[33m76c9e46[m update submodule imosmwidget
+[33mb1f448f[m add screenshot.png
+[33m53cf57d[m Update README.md
+[33m7fd5ea6[m readme: fix url ImOsmWidget
+[33md8434a7[m Merge pull request #1 from gorbatschow/readme
+[33m4498946[m Update README.md
+[33m9cbd86e[m add demo.gif with smaller resolution
+[33m3ac7bb8[m delete demo.gif
+[33me00e9f0[m add demo.gif with higher resolution
+[33mf36c2c4[m delete demo.gif
+[33m338c12d[m add demo.gif with higher resolution
+[33m718606c[m delete demo.gif
+[33ma59d3c4[m add demo.gif
+[33md55a95b[m update submodules ImApplication & ImOsmWidget
+[33mdfda8e5[m add LICENSE file
+[33md8c630c[m dock map widget to central node in start
+[33m83879cc[m update submodule ImApplication
+[33mde8433d[m update submodule ImOsmWidget
+[33m7462f76[m add ui elements to change location
+[33m076012f[m update ImOsmWidget submodule
+[33m98b28bd[m update submodule ImOsmWidget
+[33mdbd1989[m update ImOsmWidget submodule
+[33m0f09b4f[m update submodule ImOsmWidget
+[33mf3d8007[m update submodule ImApplication
+[33mc4f35c8[m changed project name in cmake's configuration
+[33m8ff1cd1[m add CMakeLists for entire project
+[33mf7c9de6[m add executable sources
+[33me359060[m add CMakeLists.txt for ImOsmWidget submodule
+[33m214f21e[m update submodule ImOsmWidget
+[33m4b46d12[m update ImApplication submodule
+[33m0fe81b0[m add submodule ImOsmWidget
+[33m9efaea0[m Initial commit

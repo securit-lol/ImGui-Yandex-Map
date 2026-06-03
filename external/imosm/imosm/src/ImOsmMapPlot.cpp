@@ -73,8 +73,6 @@ void MapPlot::paint() {
     _maxTY = std::clamp(int(_maxY * _tilesNum), 0, _tilesNum - 1);
 
     _loader->beginLoad(_zoom, _minTX, _maxTX, _minTY, _maxTY);
-    
-  paintBackgroundTiles();
 
     ImVec2 bmin{float(_minTX), float(_minTY)};
     ImVec2 bmax{float(_maxTX), float(_maxTY)};
@@ -95,39 +93,6 @@ void MapPlot::paint() {
     paintOverMap();
 
     ImPlot::EndPlot();
-  }
-}
-
-void MapPlot::paintBackgroundTiles() {
-  // Draw older zoom levels as background while current zoom is loading
-  const auto& allTiles = _loader->getTiles();
-  
-  // Find background zoom levels (lower than current)
-  for (const auto& tile : allTiles) {
-    int tileZ = tile->z();
-    
-    // Only draw background tiles (lower zoom = older/lower-res)
-    if (tileZ >= _zoom) continue;
-    
-    int tileX = tile->x();
-    int tileY = tile->y();
-    
-    if (tile->isDummy()) continue;
-    
-    // Calculate scale factor for how many current-zoom tiles this covers
-    int scaleFactor = 1 << (_zoom - tileZ);  // 2^(_zoom - tileZ)
-    
-    // Calculate bounds of this background tile in current zoom coordinates
-    ImVec2 bmin{float(tileX * scaleFactor) / float(POW2[_zoom]),
-                 float(tileY * scaleFactor) / float(POW2[_zoom])};
-    ImVec2 bmax{float((tileX + 1) * scaleFactor) / float(POW2[_zoom]),
-                 float((tileY + 1) * scaleFactor) / float(POW2[_zoom])};
-    
-    // Only draw if in current view bounds
-    if (bmax.x >= _minX && bmin.x <= _maxX &&
-        bmax.y >= _minY && bmin.y <= _maxY) {
-      ImPlot::PlotImage("##bg", tile->texture(), bmin, bmax, _uv0, _uv1, _tint);
-    }
   }
 }
 } // namespace ImOsm

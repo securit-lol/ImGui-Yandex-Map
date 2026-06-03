@@ -17,8 +17,8 @@ void RichMapPlot::paintOverMap() {
 
   std::for_each(_items.begin(), _items.end(), [this](auto ptr) {
     auto item{ptr.lock()};
-    if (item->enabled() &&
-        item->inBounds(minLat(), maxLat(), minLon(), maxLon()))
+    // if (item->enabled() && item->inBounds(minLat(), maxLat(), minLon(), maxLon()))
+    if (item->enabled())
       item->paint();
   });
 }

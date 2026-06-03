@@ -10,20 +10,21 @@ void ImOsm::Rich::ShowMarkPanel(std::shared_ptr<RichMapPlot> plot) {
   static bool inited = false;
   if (!inited) {
     if (plot) InitMarkRenderer(plot);
+    AddMarksFromApi();
     inited = true;
   }
 
-  if (ImGui::Button("Init Mark Renderer")) {
-    if (plot) InitMarkRenderer(plot);
-  }
-  ImGui::SameLine();
-  if (ImGui::Button("Load Marks From API")) {
-    AddMarksFromApi();
-  }
-  ImGui::SameLine();
-  if (ImGui::Button("Clear Marks")) {
-    ClearMarks();
-  }
+  // if (ImGui::Button("Init Mark Renderer")) {
+  //   if (plot) InitMarkRenderer(plot);
+  // }
+  //ImGui::SameLine();
+  // if (ImGui::Button("Load Marks From API")) {
+  //   AddMarksFromApi();
+  // }
+  // ImGui::SameLine();
+  // if (ImGui::Button("Clear Marks")) {
+  //   ClearMarks();
+  // }
 
   ImGui::Separator();
 
