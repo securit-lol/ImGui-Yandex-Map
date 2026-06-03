@@ -1,5 +1,6 @@
 #include "ImOsmDemoApp.h"
 #include <imgui_internal.h>
+#include "YandexData.h"
 
 using namespace ImOsm;
 using namespace ImOsm::Rich;
@@ -21,6 +22,15 @@ ImOsmDemoApp::ImOsmDemoApp()
     mINI::INIFile iniFile(_iniFileNameMark);
     iniFile.read(ini);
     _markStorage->loadState(ini);
+
+    api::GetAllStations();
+    for (const auto& __country : api::data::all_country_data) {
+            for (const auto& __region : __country.regions) {
+                for (const auto& __lement : __region.settlements) {
+                    _markEditorWidget->AddMarkCustom({ __lement.latitude, __lement.longitude},__lement.title);
+                }
+            }
+        }
   }
   {
     mINI::INIStructure ini;
@@ -56,7 +66,7 @@ void ImOsmDemoApp::firstPaint() {
       ImGui::DockBuilderGetCentralNode(dockSpaceID())->ID};
   ImGui::DockBuilderDockWindow("MapWidget", centralNode);
 }
-
+static bool act = false;
 void ImOsmDemoApp::paint() {
   ImGui::Begin("MapWidget");
 
@@ -96,17 +106,22 @@ void ImOsmDemoApp::paint() {
 
   ImGui::End();
 
-  ImGui::Begin("MarkEditor");
-  _distanceCalcWidget->paint();
-  ImGui::Separator();
-  _destinationCalcWidget->paint();
-  ImGui::Separator();
-  _markEditorWidget->paint();
-  ImGui::End();
+  // ImGui::Begin("MarkEditor");
+  // _distanceCalcWidget->paint();
+  // ImGui::Separator();
+  // _destinationCalcWidget->paint();
+  // ImGui::Separator();
+  // _markEditorWidget->paint();
 
-  ImGui::Begin("TileSource");
-  _tileSourceWidget->paint();
-  ImGui::Separator();
-  _tileGrabberWidget->paint();
-  ImGui::End();
+  
+
+  // //_markEditorWidget
+  
+  // ImGui::End();
+
+  // ImGui::Begin("TileSource");
+  // _tileSourceWidget->paint();
+  // ImGui::Separator();
+  // _tileGrabberWidget->paint();
+  // ImGui::End();
 }

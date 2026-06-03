@@ -16,5 +16,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC mini)
 target_link_libraries(${PROJECT_NAME} PUBLIC imapp)
 target_link_libraries(${PROJECT_NAME} PUBLIC imosm)
 target_link_libraries(${PROJECT_NAME} PUBLIC imwrap)
-
+target_link_libraries(${PROJECT_NAME} PUBLIC logic_lib)
 

@@ -32,6 +32,8 @@ add_subdirectory(external/latlon)
 # IMOSM
 add_subdirectory(external/imosm)
 
+add_subdirectory(YandexApi)
+
 # EXECUTABLE
 add_subdirectory(src)
 
