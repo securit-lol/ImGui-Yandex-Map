@@ -25,8 +25,8 @@ void ImOsm::TileLoader::enforceCacheLimit() {
     std::sort(_tiles.begin(), _tiles.end(),
               [this](const std::shared_ptr<ITile> &a,
                      const std::shared_ptr<ITile> &b) {
-                int zoomA = a->zoom();
-                int zoomB = b->zoom();
+                int zoomA = a->z();
+                int zoomB = b->z();
                 int distA = std::abs(zoomA - _currentZoom);
                 int distB = std::abs(zoomB - _currentZoom);
                 if (distA != distB) return distA < distB;

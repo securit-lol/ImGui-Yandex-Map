@@ -17,7 +17,7 @@ public:
     ImPlotMarker markerType{ImPlotMarker_Circle};
     float markerSize{5.f};
     float markerWeight{};
-    ImVec4 markerFill{0.7f, 0.7f, 0.7f, 1.f};
+    ImVec4 markerFill{0.01f, 0.02f, 0.02f, 1.f};
     ImVec4 markerOutline{};
     float radiusWeight{3.f};
   };
