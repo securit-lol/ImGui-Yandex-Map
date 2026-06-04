@@ -8,7 +8,6 @@ template<typename T>
 T Max(const T& a, const T& b) {
     return (a > b) ? a : b;
 }
-std::mutex list_mutex;
 
 
 namespace api {
@@ -97,6 +96,12 @@ namespace api {
     }
 
     void GetAllStations() {
+        
+        if (data::kApiKey.size()  == 0) {
+
+            std::cout << "ApiKey is empty, please setup kApiKey in YandexApi/YandexData.cpp" << std::endl;
+            std::abort();
+        }
         std::cout << "Getting all stations data, please - wait..." << std::endl;
         std::string url = "https://api.rasp.yandex-net.ru/v3.0/stations_list/";
         cpr::Parameters parameters = {

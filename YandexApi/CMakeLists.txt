@@ -18,9 +18,8 @@ add_library(logic_lib STATIC
     YandexData.cpp
 )
 
-# Добавляем системные библиотеки, необходимые для libcurl/PSL
 find_package(Threads REQUIRED)
-find_package(LibXml2 REQUIRED)  # возможно понадобится
+find_package(LibXml2 REQUIRED)
 
 target_link_libraries(logic_lib
     PUBLIC
@@ -29,7 +28,6 @@ target_link_libraries(logic_lib
     ${CMAKE_THREAD_LIBS_INIT}
 )
 
-# Добавляем библиотеки PSL и его зависимости
 target_link_libraries(logic_lib
     PUBLIC
     idn2

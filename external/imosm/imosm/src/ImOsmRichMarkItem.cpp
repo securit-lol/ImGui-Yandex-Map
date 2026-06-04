@@ -34,10 +34,12 @@ bool MarkItem::inBounds(float minLat,
 }
 
 void MarkItem::paint() {
+
+  ImVec4  _markerFill = {_style.markerFill.x,_style.markerFill.y,_style.markerFill.z, _style.markerFill.w};
   if (_style.markerEnabled) {
     ImPlot::SetNextMarkerStyle(_style.markerType,
                                _style.markerSize,
-                               _style.markerFill,
+                               _markerFill,
                                _style.markerWeight,
                                _style.markerOutline);
     ImGui::PushID(&_osmCoords);
@@ -46,7 +48,7 @@ void MarkItem::paint() {
   }
 
   if (_style.textEnabled) {
-    ImGui::PushStyleColor(ImGuiCol_Text, _style.markerFill);
+    ImGui::PushStyleColor(ImGuiCol_Text, _markerFill);
     ImGui::PushID(_text.c_str());
     ImPlot::PlotText(_text.c_str(),
                      _osmCoords.x,
@@ -57,7 +59,7 @@ void MarkItem::paint() {
   }
 
   if (_style.radiusEnabled) {
-    ImPlot::SetNextLineStyle(_style.markerFill, _style.radiusWeight);
+    ImPlot::SetNextLineStyle(_markerFill, _style.radiusWeight);
     ImGui::PushID(_rx.data());
     ImPlot::PlotLine("##", _rx.data(), _ry.data(), _rx.size());
     ImGui::PopID();
