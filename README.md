@@ -1,13 +1,12 @@
-# ImOsmDemo
+# ImGuiYandexMap
+An interactive map application built with ImGui and ImOsmWidget.
 
-This is an application for demonstrate possibilities of [ImOsmWidget](https://github.com/gorbatschow/ImOsmWidget).
-It is based on [ImProject](https://github.com/gorbatschow/ImProject) template.
+This fork enhances the original demo by integrating Yandex Schedule API, allowing users to visualize transport stations and build routes directly on the map.
 
-ImOsmWidget is included as submodule in directory *external/imosmwidget/*.
+## Screenshots
 
-In short I use ImGui with GLFW backend, ImPlot, CURL and STB libraries to display interactive map using tiles provided by OpenStreetMap.
-
-![image](doc/demo.gif)
+![image1](doc/show1.png)
+![image2](doc/show2.png)
 
 ## Ubuntu dependencies
 
@@ -20,3 +19,17 @@ For ImOsmWidget libcurl needed
 libcurl4-gnutls-dev
 ```
 
+## Fork Improvements
+
+Compared to the original ImOsmDemo:
+
+- Added Yandex API integration
+- Added transport station rendering
+- Added route calculation
+
+## Credits
+
+- Original ImOsmDemo project
+- ImOsmWidget
+- OpenStreetMap
+- Yandex Schedule API

@@ -8,6 +8,8 @@ set(CXX_CMAKE_STANDARD_REQUIRED ON)
 set(IMPROJECTEXE_SRC
     main.cpp
     ImOsmDemoApp.cpp
+    ImOsmMarkRenderer.cpp
+    #ImOsmMarkPanel.cpp
 )
 
 add_executable(${PROJECT_NAME} ${IMPROJECTEXE_SRC})
@@ -16,5 +18,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC mini)
 target_link_libraries(${PROJECT_NAME} PUBLIC imapp)
 target_link_libraries(${PROJECT_NAME} PUBLIC imosm)
 target_link_libraries(${PROJECT_NAME} PUBLIC imwrap)
-
+target_link_libraries(${PROJECT_NAME} PUBLIC logic_lib)
 
