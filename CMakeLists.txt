@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16.0)
 
 project(ImOsmDemo VERSION 1.0.0)
 
+add_subdirectory(YandexApi)
+
 # STB
 add_subdirectory(external/stb)
 
@@ -31,8 +33,6 @@ add_subdirectory(external/latlon)
 
 # IMOSM
 add_subdirectory(external/imosm)
-
-add_subdirectory(YandexApi)
 
 # EXECUTABLE
 add_subdirectory(src)

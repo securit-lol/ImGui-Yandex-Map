@@ -3,10 +3,10 @@
 #include "ImOsmRichMarkItem.h"
 #include "ImOsmRichMarkItemWidget.h"
 #include <misc/cpp/imgui_stdlib.h>
-
+#include <iostream>
 namespace ImOsm {
 namespace Rich {
-
+const float kInf = 1e9;
 struct MarkEditorWidget::Ui {
   inline static const char latlonFormat[]{"%.6f"};
   std::array<float, 2> latLonInput{0.f, 0.f};
@@ -23,41 +23,59 @@ MarkEditorWidget::MarkEditorWidget(std::shared_ptr<RichMapPlot> plot,
 
 MarkEditorWidget::~MarkEditorWidget() = default;
 
-void MarkEditorWidget::AddMarkCustom(std::array<float, 2> latLonInput, std::string markNameInputText) {
-  _storage->addMark(latLonInput, markNameInputText);
+void MarkEditorWidget::AddMarkCustom(std::array<float, 2> latLonInput, std::string markNameInputText, const void* ptr) {
+  _storage->addMark(latLonInput, markNameInputText, ptr);
   _plot->addItem(_storage->_markItems.back().ptr);
 }
 
-void MarkEditorWidget::paint() {
-  ImGui::TextUnformatted("Mark Editor");
-  paint_latLonInput();
-  ImGui::SameLine();
-  paint_mousePickBtn();
-  paint_markNameInput();
-  ImGui::SameLine();
-  paint_addMarkBtn();
-  paint_markTable();
+inline float ImLength(const ImVec2& a, const ImVec2& b) {
+    return hypotf(a.x - b.x, a.y - b.y);
+}
 
-  if (_ui->isMousePick && _plot->mouseOnPlot() && ImGui::IsMouseClicked(0)) {
-    _ui->isMousePick = false;
+const void* MarkEditorWidget::paint() {
+   //ImGui::TextUnformatted("Mark Editor");
+  // paint_latLonInput();
+  // ImGui::SameLine();
+  // paint_mousePickBtn();
+  // paint_markNameInput();
+  // ImGui::SameLine();
+  // paint_addMarkBtn();
+  // paint_markTable();
+
+
+  
     _ui->latLonInput = {_plot->mouseLat(), _plot->mouseLon()};
-  }
+    
+    float min_dist = kInf;
+    const void* min_dist_circle_name = nullptr;
+    for(auto st : _storage->markItems()) {
+      float dist = ImLength({_plot->mouseLat(), _plot->mouseLon()}, {st.ptr.get()->geoCoords().lat, st.ptr.get()->geoCoords().lon});
+      
+      if (dist < min_dist) {
+        min_dist = dist;
+        min_dist_circle_name = st.ptr.get()->_ptr;
+      }
+    }
+    //std::cout << min_dist_circle_name << " " <<  std::endl;
+  if (min_dist < 0.5)
+    return min_dist_circle_name;
+  else 
+    return nullptr;
+  // if (_ui->isMarkAdd) {
+  //   _ui->isMarkAdd = false;
+  //   _storage->addMark(_ui->latLonInput, _ui->markNameInputText);
+  //   _plot->addItem(_storage->_markItems.back().ptr);
+  // }
 
-  if (_ui->isMarkAdd) {
-    _ui->isMarkAdd = false;
-    _storage->addMark(_ui->latLonInput, _ui->markNameInputText);
-    _plot->addItem(_storage->_markItems.back().ptr);
-  }
+  // if (_storage->handleLoadState()) {
+  //   const auto &markItems{_storage->markItems()};
+  //   std::for_each(markItems.begin(), markItems.end(),
+  //                 [this](auto &item) { _plot->addItem(item.ptr); });
+  // }
 
-  if (_storage->handleLoadState()) {
-    const auto &markItems{_storage->markItems()};
-    std::for_each(markItems.begin(), markItems.end(),
-                  [this](auto &item) { _plot->addItem(item.ptr); });
-  }
-
-  if (_storage->handlePickState()) {
-    _ui->latLonInput = _storage->_pickCoords;
-  }
+  // if (_storage->handlePickState()) {
+  //   _ui->latLonInput = _storage->_pickCoords;
+  // }
 }
 
 void MarkEditorWidget::paint_latLonInput() {

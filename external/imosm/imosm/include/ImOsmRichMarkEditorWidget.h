@@ -14,8 +14,8 @@ public:
                    std::shared_ptr<MarkStorage> storage);
   ~MarkEditorWidget();
 
-  void paint();
-    void AddMarkCustom(std::array<float, 2> latLonInput, std::string markNameInputText) ;
+  const void* paint();
+    void AddMarkCustom(std::array<float, 2> latLonInput, std::string markNameInputText, const void* ptr) ;
 private:
   void paint_latLonInput();
   void paint_mousePickBtn();

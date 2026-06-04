@@ -26,7 +26,7 @@ public:
   }
 
 private:
-  void addMark(const GeoCoords &coords, const std::string &name);
+  void addMark(const GeoCoords &coords, const std::string &name, const void* ptr);
   void rmMarks();
   bool handlePickState();
   bool handleLoadState();

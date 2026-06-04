@@ -95,8 +95,8 @@ void MarkStorage::saveState(mINI::INIStructure &ini) const {
   }
 }
 
-void MarkStorage::addMark(const GeoCoords &coords, const std::string &name) {
-  _markItems.push_back({std::make_shared<MarkItem>(coords, name)});
+void MarkStorage::addMark(const GeoCoords &coords, const std::string &name, const void* ptr) {
+  _markItems.push_back({std::make_shared<MarkItem>(coords, name, ptr)});
 }
 
 void MarkStorage::rmMarks() {

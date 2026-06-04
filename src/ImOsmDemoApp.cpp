@@ -9,7 +9,6 @@ using namespace ImOsm::Rich;
 ImOsmDemoApp::ImOsmDemoApp()
     : ImApp::MainWindow("ImOsm Demo Application"),
       _mapPlot{std::make_shared<RichMapPlot>()},
-      
       _tileSourceWidget{std::make_unique<TileSourceWidget>(_mapPlot)},
       _tileGrabberWidget{std::make_unique<TileGrabberWidget>(_mapPlot)} {
   {
@@ -22,6 +21,11 @@ ImOsmDemoApp::ImOsmDemoApp()
 
     _mapPlot->setBoundsGeo(ImOsm::MinLat, ImOsm::MaxLat, ImOsm::MinLon,
                            ImOsm::MaxLon);
+
+
+    InitMarkRenderer(_mapPlot);
+    AddMarksFromApi();          
+                           
   }
 }
 
@@ -43,7 +47,8 @@ void ImOsmDemoApp::firstPaint() {
       ImGui::DockBuilderGetCentralNode(dockSpaceID())->ID};
   ImGui::DockBuilderDockWindow("MapWidget", centralNode);
 }
-static bool act = false;
+
+
 void ImOsmDemoApp::paint() {
   ImGui::Begin("MapWidget");
 
@@ -57,7 +62,7 @@ void ImOsmDemoApp::paint() {
 
   ImGui::End();
 
-  ShowMarkPanel(_mapPlot);
+  //ShowMarkPanel(_mapPlot);
 
   // ImGui::Begin("MarkEditor");
   // _distanceCalcWidget->paint();
@@ -66,8 +71,10 @@ void ImOsmDemoApp::paint() {
   // ImGui::Separator();
   // _markEditorWidget->paint();
 
+  ImGui::Begin("MarkEditor");
   
-
+  SkanMarks();
+  ImGui::End();
   // //_markEditorWidget
   
   // ImGui::End();

@@ -8,9 +8,9 @@ MarkItem::MarkItem() {
   _ry.resize(int(360.0 / _dphi) + 1);
 }
 
-MarkItem::MarkItem(const GeoCoords &coords, const std::string &text)
+MarkItem::MarkItem(const GeoCoords &coords, const std::string &text, const void* ptr)
     : _geoCoords{coords}
-    , _text{text} {
+    , _text{text}, _ptr{ptr} {
   _osmCoords = _geoCoords.toOsmCoords();
   _rx.resize(int(360.0 / _dphi) + 1);
   _ry.resize(int(360.0 / _dphi) + 1);

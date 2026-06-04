@@ -73,7 +73,7 @@ namespace api {
     }
 
     namespace data {
-        const std::string kApiKey;
+        const std::string kApiKey = "";
         std::forward_list<Country> all_country_data = {};
         ScheduleResponse schedule_response = {};
 
@@ -191,11 +191,7 @@ namespace api {
         std::string date;
     };
 
-    std::list<Way> task_list;
-    void AddTask(const std::string& fromCity, const std::string& toCity, const std::string& date) {
-        std::lock_guard<std::mutex> lock(list_mutex);
-        task_list.push_back({ fromCity ,toCity ,date });
-    }
+    
 
 
     ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date) {
@@ -214,7 +210,7 @@ namespace api {
         std::string map_key = fromCity + "|" + toCity;
 
         ScheduleResponse result;
-
+        
         //auto it = cache::data.find(map_key, result);
         std::string day_now = GetCurrentDate();
         if (cache.find(map_key, result) && result.search.date == day_now) {
@@ -352,20 +348,9 @@ namespace api {
         return result;
     }
 
-    void ApiWorker() {
-        GetAllStations();
-        std::cout << "Api Worker start" << std::endl;
-        while (active)
-        {
-            api::UpdateStatus();
-            if (!task_list.empty()) {
-                std::lock_guard<std::mutex> lock(list_mutex);
-                if (!task_list.front().fromCity.empty() && !task_list.front().toCity.empty()&& !task_list.front().date.empty())
-                    data::schedule_response = GetWay(task_list.front().fromCity, task_list.front().toCity, task_list.front().date);
-                task_list.pop_front();
-            }
-        }
-        std::cout << "Api Worker stopt" << std::endl;
+    void AddTask(const std::string& fromCity, const std::string& toCity, const std::string& date) {
+        if (!fromCity.empty() && !toCity.empty()&& !date.empty()) 
+            data::schedule_response = GetWay(fromCity, toCity, date);
     }
 } // namespace api
 

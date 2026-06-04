@@ -23,7 +23,7 @@ public:
   };
 
   MarkItem();
-  MarkItem(const GeoCoords &coords, const std::string &text);
+  MarkItem(const GeoCoords &coords, const std::string &text, const void* ptr);
   virtual ~MarkItem() override;
 
   virtual bool inBounds(float minLat,
@@ -61,7 +61,7 @@ public:
   inline void setStyle(const Style &style) { _style = style; }
   inline const Style &style() const { return _style; }
   inline Style &style() { return _style; }
-
+  const void* _ptr;
 private:
   void updateRadiusPoints();
   void updateRadiusBounds();
