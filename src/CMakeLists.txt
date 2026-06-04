@@ -9,7 +9,7 @@ set(IMPROJECTEXE_SRC
     main.cpp
     ImOsmDemoApp.cpp
     ImOsmMarkRenderer.cpp
-    ImOsmMarkPanel.cpp
+    #ImOsmMarkPanel.cpp
 )
 
 add_executable(${PROJECT_NAME} ${IMPROJECTEXE_SRC})

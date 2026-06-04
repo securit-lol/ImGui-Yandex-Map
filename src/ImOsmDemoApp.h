@@ -21,11 +21,6 @@ protected:
   void paint() override;
 
 private:
-  ImWrap::Button _worldBtn{"World"};
-  ImWrap::Button _berlinBtn{"Berlin"};
-  ImWrap::Button _parisBtn{"Paris"};
-  ImWrap::Button _madridBtn{"Madrid"};
-
   std::shared_ptr<ImOsm::Rich::RichMapPlot> _mapPlot;
   
   std::unique_ptr<ImOsm::TileSourceWidget> _tileSourceWidget;

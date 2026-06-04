@@ -78,6 +78,8 @@ const void* MarkEditorWidget::paint() {
   // }
 }
 
+
+
 void MarkEditorWidget::paint_latLonInput() {
   ImGui::PushItemWidth(200 + ImGui::GetStyle().ItemSpacing.x / 2);
   ImGui::InputFloat2("Lat/Lon", _ui->latLonInput.data(), _ui->latlonFormat);
