@@ -1,7 +1,6 @@
 #pragma once
 #include <imapp.h>
 #include <imosm.h>
-#include <imosm_rich.h>
 #include <imwrap.h>
 
 namespace ImOsm {
@@ -21,8 +20,5 @@ protected:
   void paint() override;
 
 private:
-  std::shared_ptr<ImOsm::Rich::RichMapPlot> _mapPlot;
-  
-  // std::unique_ptr<ImOsm::TileSourceWidget> _tileSourceWidget;
-  // std::unique_ptr<ImOsm::TileGrabberWidget> _tileGrabberWidget;
+  std::shared_ptr<ImOsm::MapPlot> _mapPlot;
 };

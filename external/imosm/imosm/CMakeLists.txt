@@ -21,9 +21,9 @@ set(IMOSM_SRC
     #src/ImOsmRichMarkItemWidget.cpp
     #src/ImOsmRichDestinationCalcWidget.cpp
     #src/ImOsmRichDistanceCalcWidget.cpp
-    src/ImOsmRichMapPlot.cpp
-    src/ImOsmTileGrabberWidget.cpp
-    src/ImOsmTileSourceWidget.cpp
+    #src/ImOsmRichMapPlot.cpp
+    #src/ImOsmTileGrabberWidget.cpp
+    #src/ImOsmTileSourceWidget.cpp
     src/ImOsmTileSourceUrlImpl.cpp
     src/ImOsmTileSourceFs.cpp
     src/ImOsmTileSaver.cpp
