@@ -6,7 +6,7 @@ using namespace ImOsm;
 using namespace ImOsm::Rich;
 
 ImOsmDemoApp::ImOsmDemoApp()
-    : ImApp::MainWindow("ImOsm Demo Application"),
+    : ImApp::MainWindow("ImGui Yandex Map"),
       _mapPlot{std::make_shared<ImOsm::MapPlot>()}//,
       // _tileSourceWidget{std::make_unique<TileSourceWidget>(_mapPlot)},
       // _tileGrabberWidget{std::make_unique<TileGrabberWidget>(_mapPlot)} 
@@ -49,6 +49,6 @@ void ImOsmDemoApp::paint() {
   // ImGui::Text("VIEW: lat %.2f:%.2f, lon %.2f:%.2f ", _mapPlot->minLat(), _mapPlot->maxLat(), _mapPlot->minLon(), _mapPlot->maxLon());
     ImGui::Text("ZOOM: %.2f", _mapPlot->current_zoom());
    _mapPlot->paint();
-
+    
    ImGui::End();
 }

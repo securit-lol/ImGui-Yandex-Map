@@ -6,13 +6,9 @@
 
 namespace ImOsm {
 MapPlot::MapPlot() : _loader{std::make_shared<TileLoaderOsmMap>()} {
-   addPoint("pidor",0,80);
-   getReadyToDraw();
 }
 
 MapPlot::MapPlot(std::shared_ptr<ITileLoader> &loader) : _loader{loader} {
-  addPoint("pidor",0,80);;
-  getReadyToDraw();
   resetBounds();
 }
 
@@ -114,14 +110,22 @@ void MapPlot::paint() {
         alpha = 1.0f;
     }
 
-    if (alpha > 0.0f) {
-    for (auto _obj :  *getPoints()) {
+    const std::vector<std::pair<std::string,OsmCoords>>* dots = getPoints();
+    if (dots && alpha > 0.0f) {
+      
+      
+    for (auto _obj :  *dots) {
         double x = _obj.second.x;
         double y = _obj.second.y;
     
-    ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 8.0f, ImVec4(1, 0, 0, alpha), 1.5f, ImVec4(1, 1, 1, 1));
+    ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 7.0f, ImVec4(0, 0, 0, alpha), 1.5f, ImVec4(1, 1, 1, 1));
     
     ImPlot::PlotScatter("Point", &x, &y, 1);
+    ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(1, 19));
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, alpha));
+    ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(0, 18));
+    ImGui::PopStyleColor();
+    
     }
   }
 
