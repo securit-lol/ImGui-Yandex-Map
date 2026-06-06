@@ -6,7 +6,7 @@ using namespace ImOsm;
 using namespace ImOsm::Rich;
 
 namespace {
-std::shared_ptr<MarkStorage> s_storage;
+//std::shared_ptr<MarkStorage> s_storage;
 //std::unique_ptr<MarkEditorWidget> s_editor;
 std::shared_ptr<RichMapPlot> s_plot;
 bool choose_idx = 0;
