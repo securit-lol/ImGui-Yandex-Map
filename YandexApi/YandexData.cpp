@@ -72,7 +72,7 @@ namespace api {
     }
 
     namespace data {
-        const std::string kApiKey = "";
+        const std::string kApiKey = "a395ce5a-0d6f-43ff-8bf2-02b9d87b63e1";
         std::forward_list<Country> all_country_data = {};
         ScheduleResponse schedule_response = {};
 

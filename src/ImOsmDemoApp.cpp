@@ -12,31 +12,14 @@ ImOsmDemoApp::ImOsmDemoApp()
       _tileSourceWidget{std::make_unique<TileSourceWidget>(_mapPlot)},
       _tileGrabberWidget{std::make_unique<TileGrabberWidget>(_mapPlot)} {
   {
-    mINI::INIStructure ini;
-    mINI::INIFile iniFile(_iniFileNameMain);
-    iniFile.read(ini);
-    _mapPlot->loadState(ini);
-    _tileSourceWidget->loadState(ini);
-    _tileGrabberWidget->loadState(ini);
-
-    _mapPlot->setBoundsGeo(ImOsm::MinLat, ImOsm::MaxLat, ImOsm::MinLon,
-                           ImOsm::MaxLon);
-
-
     InitMarkRenderer(_mapPlot);
-    AddMarksFromApi();          
-                           
+    AddMarksFromApi();                        
   }
 }
 
 ImOsmDemoApp::~ImOsmDemoApp() {
   {
-    mINI::INIStructure ini;
-    mINI::INIFile iniFile(_iniFileNameMain);
-    _mapPlot->saveState(ini);
-    _tileSourceWidget->saveState(ini);
-    _tileGrabberWidget->saveState(ini);
-    iniFile.write(ini);
+
   }
 }
 
