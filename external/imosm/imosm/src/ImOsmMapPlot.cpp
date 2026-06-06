@@ -5,9 +5,14 @@
 #include <implot.h>
 
 namespace ImOsm {
-MapPlot::MapPlot() : _loader{std::make_shared<TileLoaderOsmMap>()} {}
+MapPlot::MapPlot() : _loader{std::make_shared<TileLoaderOsmMap>()} {
+   addPoint("pidor",0,80);
+   getReadyToDraw();
+}
 
 MapPlot::MapPlot(std::shared_ptr<ITileLoader> &loader) : _loader{loader} {
+  addPoint("pidor",0,80);;
+  getReadyToDraw();
   resetBounds();
 }
 
@@ -54,6 +59,10 @@ void MapPlot::paint() {
     _resX = _pixelsX / _rangeX;
     _resY = _pixelsY / _rangeY;
     _zoom = std::clamp(int(floor(log2(_resX / _tilePixels))), MinZoom, MaxZoom);
+    
+    float zoomContinuous = log2(_resX / _tilePixels);
+    _cur_zoom = std::clamp(zoomContinuous, (float)MinZoom, (float)MaxZoom);
+
     _tilesNum = POW2[_zoom];
     _tileSize = 1.0 / float(_tilesNum);
 
@@ -90,7 +99,31 @@ void MapPlot::paint() {
 
     _loader->endLoad();
 
-    //paintOverMap();
+
+
+    float alpha = 0.1f;
+
+    if (_cur_zoom < 4.0f) {
+        alpha = 0.1f;
+    } 
+    else if (_cur_zoom >= 4.0f && _cur_zoom < 8.0f) {
+        float t = (_cur_zoom - 4.0f) / (8.0f - 4.0f);
+         alpha = 0.1f + t * 0.9f;
+    } 
+    else {
+        alpha = 1.0f;
+    }
+
+    if (alpha > 0.0f) {
+    for (auto _obj :  *getPoints()) {
+        double x = _obj.second.x;
+        double y = _obj.second.y;
+    
+    ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 8.0f, ImVec4(1, 0, 0, alpha), 1.5f, ImVec4(1, 1, 1, 1));
+    
+    ImPlot::PlotScatter("Point", &x, &y, 1);
+    }
+  }
 
     ImPlot::EndPlot();
   }

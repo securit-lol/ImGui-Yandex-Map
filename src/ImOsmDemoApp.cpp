@@ -46,8 +46,8 @@ void ImOsmDemoApp::paint() {
 
    ImGui::Text("FPS: %.0f", ImGui::GetIO().Framerate);
    ImGui::Text("MOUSE: lat %.2f, lon %.2f", _mapPlot->mouseLon(), _mapPlot->mouseLat());
-   ImGui::Text("VIEW: lat %.2f:%.2f, lon %.2f:%.2f ", _mapPlot->minLat(), _mapPlot->maxLat(), _mapPlot->minLon(), _mapPlot->maxLon());
-
+  // ImGui::Text("VIEW: lat %.2f:%.2f, lon %.2f:%.2f ", _mapPlot->minLat(), _mapPlot->maxLat(), _mapPlot->minLon(), _mapPlot->maxLon());
+    ImGui::Text("ZOOM: %.2f", _mapPlot->current_zoom());
    _mapPlot->paint();
 
    ImGui::End();
