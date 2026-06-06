@@ -15,10 +15,10 @@ set(IMOSM_SRC
     src/ImOsmMapPlot.cpp
     src/ImOsmTileLoaderUrl.cpp
     src/ImOsmTileTexture.cpp
-    src/ImOsmRichMarkItem.cpp
-    src/ImOsmRichMarkStorage.cpp
-    src/ImOsmRichMarkEditorWidget.cpp
-    src/ImOsmRichMarkItemWidget.cpp
+    #src/ImOsmRichMarkItem.cpp
+    #src/ImOsmRichMarkStorage.cpp
+    #src/ImOsmRichMarkEditorWidget.cpp
+    #src/ImOsmRichMarkItemWidget.cpp
     src/ImOsmRichDestinationCalcWidget.cpp
     src/ImOsmRichDistanceCalcWidget.cpp
     src/ImOsmRichMapPlot.cpp

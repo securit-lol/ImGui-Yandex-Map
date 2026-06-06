@@ -7,7 +7,7 @@ using namespace ImOsm::Rich;
 
 namespace {
 std::shared_ptr<MarkStorage> s_storage;
-std::unique_ptr<MarkEditorWidget> s_editor;
+//std::unique_ptr<MarkEditorWidget> s_editor;
 std::shared_ptr<RichMapPlot> s_plot;
 bool choose_idx = 0;
 bool choose_dot;
@@ -17,8 +17,8 @@ std::list<const api::Lement*> search_results;
 
 void ImOsm::Rich::InitMarkRenderer(std::shared_ptr<RichMapPlot> plot) {
   s_plot = plot;
-  s_storage = std::make_shared<MarkStorage>();
-  s_editor = std::make_unique<MarkEditorWidget>(s_plot, s_storage);
+  //s_storage = std::make_shared<MarkStorage>();
+  //s_editor = std::make_unique<MarkEditorWidget>(s_plot, s_storage);
   choose_idx = 0;
   choose_dot = false;
   search_buffer;
@@ -26,14 +26,14 @@ void ImOsm::Rich::InitMarkRenderer(std::shared_ptr<RichMapPlot> plot) {
 }
 
 void ImOsm::Rich::AddMarksFromApi() {
-  if (!s_editor) InitMarkRenderer(s_plot);
+  //if (!s_editor) InitMarkRenderer(s_plot);
   api::GetAllStations();
   for (const auto &country : api::data::all_country_data) {
     for (const auto &region : country.regions) {
       for (const auto &lement : region.settlements) {
-        if (s_editor)
-          s_editor->AddMarkCustom({lement.latitude, lement.longitude},
-                                  lement.title, &lement);
+        // if (s_editor)
+        //   s_editor->AddMarkCustom({lement.latitude, lement.longitude},
+        //                           lement.title, &lement);
       }
     }
   }
@@ -81,27 +81,27 @@ void ImOsm::Rich::SkanMarks() {
     ImGuiWindowFlags_NoMove |
     ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_NoTitleBar);
-  if (!s_editor) InitMarkRenderer(s_plot);
+  //if (!s_editor) InitMarkRenderer(s_plot);
   api::UpdateStatus();
   if (ImGui::Button("Выбрать точку"))
     choose_dot = true;
   if (s_plot->mouseOnPlot() && ImGui::IsMouseClicked(0) && choose_dot) {
-    const void* ptr = s_editor->paint();
-    if (ptr) {
-      choose_dot = false;
-            if (choose_idx) {
-                api::data::lement_2 = static_cast<const api::Lement*> (ptr);
-            }
-            else {
-                api::data::lement_1 = static_cast<const api::Lement*>( ptr);
-            }
-            choose_idx = !choose_idx;
-            if (api::data::lement_1)
-            std::cout <<  api::data::lement_1->title << std::endl;
-            if (api::data::lement_2)
-            std::cout <<  api::data::lement_2->title << std::endl;
+    // const void* ptr = s_editor->paint();
+    // if (ptr) {
+    //   choose_dot = false;
+    //         if (choose_idx) {
+    //             api::data::lement_2 = static_cast<const api::Lement*> (ptr);
+    //         }
+    //         else {
+    //             api::data::lement_1 = static_cast<const api::Lement*>( ptr);
+    //         }
+    //         choose_idx = !choose_idx;
+    //         if (api::data::lement_1)
+    //         std::cout <<  api::data::lement_1->title << std::endl;
+    //         if (api::data::lement_2)
+    //         std::cout <<  api::data::lement_2->title << std::endl;
             
-    }
+    // }
             
   }
   if (api::data::lement_1 && api::data::lement_2 && api::data::lement_1->title == api::data::near_city_1.owner_title && api::data::lement_1->title == api::data::near_city_1.owner_title) {
@@ -265,6 +265,6 @@ void ImOsm::Rich::SkanMarks() {
 }
 
 void ImOsm::Rich::ClearMarks() {
-  s_editor.reset();
-  s_storage.reset();
+  //s_editor.reset();
+  //s_storage.reset();
 }

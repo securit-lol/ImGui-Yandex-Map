@@ -1,6 +1,6 @@
 #include "ImOsmRichDestinationCalcWidget.h"
 #include "ImOsmCoords.h"
-#include "ImOsmRichMarkStorage.h"
+//#include "ImOsmRichMarkStorage.h"
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
@@ -32,7 +32,7 @@ void DestinationCalcWidget::paint() {
   ImGui::SameLine();
   if (ImGui::Button("Calculate##")) {
     bool foundA{false};
-    _ui->markA = _storage->findMark(_ui->markNameA, foundA);
+    //_ui->markA = _storage->findMark(_ui->markNameA, foundA);
     if (foundA) {
       _ui->markB = _ui->markA.destination(_ui->distance, _ui->bearing);
     }
@@ -42,7 +42,7 @@ void DestinationCalcWidget::paint() {
               _ui->markB.lon);
   ImGui::SameLine();
   if (ImGui::Button("Pick##")) {
-    _storage->setPickCoords(_ui->markB);
+    //_storage->setPickCoords(_ui->markB);
   }
   ImGui::PopID();
 }
