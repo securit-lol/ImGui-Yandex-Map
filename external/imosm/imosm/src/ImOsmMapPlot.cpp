@@ -90,7 +90,7 @@ void MapPlot::paint() {
 
     _loader->endLoad();
 
-    paintOverMap();
+    //paintOverMap();
 
     ImPlot::EndPlot();
   }

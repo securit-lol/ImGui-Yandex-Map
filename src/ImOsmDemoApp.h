@@ -23,6 +23,6 @@ protected:
 private:
   std::shared_ptr<ImOsm::Rich::RichMapPlot> _mapPlot;
   
-  std::unique_ptr<ImOsm::TileSourceWidget> _tileSourceWidget;
-  std::unique_ptr<ImOsm::TileGrabberWidget> _tileGrabberWidget;
+  // std::unique_ptr<ImOsm::TileSourceWidget> _tileSourceWidget;
+  // std::unique_ptr<ImOsm::TileGrabberWidget> _tileGrabberWidget;
 };

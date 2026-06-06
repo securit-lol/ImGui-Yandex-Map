@@ -8,9 +8,10 @@ using namespace ImOsm::Rich;
 
 ImOsmDemoApp::ImOsmDemoApp()
     : ImApp::MainWindow("ImOsm Demo Application"),
-      _mapPlot{std::make_shared<RichMapPlot>()},
-      _tileSourceWidget{std::make_unique<TileSourceWidget>(_mapPlot)},
-      _tileGrabberWidget{std::make_unique<TileGrabberWidget>(_mapPlot)} {
+      _mapPlot{std::make_shared<RichMapPlot>()}//,
+      // _tileSourceWidget{std::make_unique<TileSourceWidget>(_mapPlot)},
+      // _tileGrabberWidget{std::make_unique<TileGrabberWidget>(_mapPlot)} 
+      {
   {
     InitMarkRenderer(_mapPlot);
     AddMarksFromApi();                        
@@ -61,29 +62,5 @@ void ImOsmDemoApp::paint() {
 
    ImGui::End();
 
-  
    SkanMarks();
-  
-
-
-  
-  //ShowMarkPanel(_mapPlot);
-
-  // ImGui::Begin("MarkEditor");
-  // _distanceCalcWidget->paint();
-  // ImGui::Separator();
-  // _destinationCalcWidget->paint();
-  // ImGui::Separator();
-  // _markEditorWidget->paint();
-
-  
-  // //_markEditorWidget
-  
-  // ImGui::End();
-
-  // ImGui::Begin("TileSource");
-  // _tileSourceWidget->paint();
-  // ImGui::Separator();
-  // _tileGrabberWidget->paint();
-  // ImGui::End();
 }
