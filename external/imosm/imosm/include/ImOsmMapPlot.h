@@ -90,6 +90,10 @@ public:
     inline void getReadyToDraw() {
       _ready_to_read_points.store(true, std::memory_order_release);
     }
+
+    inline bool checkReady() {
+      return _ready_to_read_points.load();
+    }
     
 private:
     std::atomic<bool> _ready_to_read_points{false};

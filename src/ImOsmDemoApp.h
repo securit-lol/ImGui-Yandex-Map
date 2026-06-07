@@ -2,6 +2,7 @@
 #include <imapp.h>
 #include <imosm.h>
 #include <imwrap.h>
+#include "ThreadWorker.h"
 
 namespace ImOsm {
 namespace Rich {
@@ -19,6 +20,7 @@ protected:
   void firstPaint() override;
   void paint() override;
 
+  std::unique_ptr<WorkerThread> worker;
 private:
   std::shared_ptr<ImOsm::MapPlot> _mapPlot;
 };

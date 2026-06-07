@@ -6,7 +6,7 @@ This fork enhances the original demo by integrating Yandex Schedule API, allowin
 ## Screenshots
 
 ![image1](doc/show1.png)
-![image2](doc/show2.png)
+![image2](doc/show2.gif)
 
 ## Ubuntu dependencies
 
