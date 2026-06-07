@@ -1,8 +1,8 @@
 #pragma once
 #include <imapp.h>
 #include <imosm.h>
-#include <imosm_rich.h>
 #include <imwrap.h>
+#include "ThreadWorker.h"
 
 namespace ImOsm {
 namespace Rich {
@@ -20,12 +20,7 @@ protected:
   void firstPaint() override;
   void paint() override;
 
+  std::unique_ptr<WorkerThread> worker;
 private:
-  std::shared_ptr<ImOsm::Rich::RichMapPlot> _mapPlot;
-  
-  std::unique_ptr<ImOsm::TileSourceWidget> _tileSourceWidget;
-  std::unique_ptr<ImOsm::TileGrabberWidget> _tileGrabberWidget;
-
-  const std::string _iniFileNameMain{"imosm_demo.ini"};
-  const std::string _iniFileNameMark{"imosm_mark.ini"};
+  std::shared_ptr<ImOsm::MapPlot> _mapPlot;
 };

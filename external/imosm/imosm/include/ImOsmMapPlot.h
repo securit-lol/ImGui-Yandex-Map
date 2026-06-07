@@ -1,7 +1,8 @@
 #pragma once
 #include "ImOsmCoords.h"
 #include <memory>
-
+#include <vector>
+#include <atomic>
 namespace ImOsm {
 class ITileLoader;
 
@@ -49,6 +50,7 @@ public:
   inline int maxTileY() const { return _maxTY; };
 
   inline int zoom() const { return _zoom; }
+  inline float current_zoom() const { return _cur_zoom; }
 
   // Local CS routines
   inline void setBoundsLocal(float minX, float maxX, float minY, float maxY);
@@ -70,7 +72,34 @@ public:
            _mousePos.y > _plotLims.Y.Min && _mousePos.y < _plotLims.Y.Max;
   }
 
+
+  inline void addPoint(const std::string& name, const double& lon, const double& lat) {
+        _points.push_back({name,GeoCoords(lat, lon).toOsmCoords()}); 
+    }
+
+   inline const std::vector<std::pair<std::string,OsmCoords>>* getPoints() {
+    if (_ready_to_read_points.load(std::memory_order_acquire)) {
+        return &_points;
+    } else {
+        return nullptr;
+    }
+    
+}
+
+
+    inline void getReadyToDraw() {
+      _ready_to_read_points.store(true, std::memory_order_release);
+    }
+
+    inline bool checkReady() {
+      return _ready_to_read_points.load();
+    }
+    
 private:
+    std::atomic<bool> _ready_to_read_points{false};
+    std::vector<std::pair<std::string,OsmCoords>> _points;
+  
+
   constexpr static const ImPlotFlags _plotFlags{ImPlotFlags_Equal |
                                                 ImPlotFlags_NoLegend};
 
@@ -99,6 +128,7 @@ private:
   int _minTX{}, _maxTX{};
   int _minTY{}, _maxTY{};
   int _zoom{};
+  float _cur_zoom{};
   float _pixelsX{}, _pixelsY{};
   float _rangeX{}, _rangeY{};
   float _resX{}, _resY{};

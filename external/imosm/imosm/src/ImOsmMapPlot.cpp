@@ -5,7 +5,8 @@
 #include <implot.h>
 
 namespace ImOsm {
-MapPlot::MapPlot() : _loader{std::make_shared<TileLoaderOsmMap>()} {}
+MapPlot::MapPlot() : _loader{std::make_shared<TileLoaderOsmMap>()} {
+}
 
 MapPlot::MapPlot(std::shared_ptr<ITileLoader> &loader) : _loader{loader} {
   resetBounds();
@@ -54,6 +55,10 @@ void MapPlot::paint() {
     _resX = _pixelsX / _rangeX;
     _resY = _pixelsY / _rangeY;
     _zoom = std::clamp(int(floor(log2(_resX / _tilePixels))), MinZoom, MaxZoom);
+    
+    float zoomContinuous = log2(_resX / _tilePixels);
+    _cur_zoom = std::clamp(zoomContinuous, (float)MinZoom, (float)MaxZoom);
+
     _tilesNum = POW2[_zoom];
     _tileSize = 1.0 / float(_tilesNum);
 
@@ -90,7 +95,52 @@ void MapPlot::paint() {
 
     _loader->endLoad();
 
-    paintOverMap();
+    float alpha_dot = 0.01f;
+    float alpha_text = 0.0f;
+
+    if (_cur_zoom < 4.0f) {
+        alpha_dot = 0.01f;
+    } 
+    else if (_cur_zoom >= 4.0f && _cur_zoom < 8.0f) {
+        float t = (_cur_zoom - 4.0f) / (8.0f - 4.0f);
+         alpha_dot = 0.01f + t * 0.99f;
+    } 
+    else {
+        alpha_dot = 1.0f;
+    }
+
+    if (_cur_zoom < 6.0f) {
+        alpha_text = 0.0f;
+    } 
+    else if (_cur_zoom >= 6.0f && _cur_zoom < 10.0f) {
+        float t = (_cur_zoom - 6.0f) / (10.0f - 6.0f);
+         alpha_text = t * 1.f;
+    } 
+    else {
+        alpha_text = 1.0f;
+    }
+
+    const std::vector<std::pair<std::string,OsmCoords>>* dots = getPoints();
+    if (dots && alpha_dot > 0.0f) {
+      
+      
+    for (auto _obj :  *dots) {
+        double x = _obj.second.x;
+        double y = _obj.second.y;
+    
+    ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 7.0f, ImVec4(0, 0, 0, alpha_dot), 1.5f, ImVec4(1, 1, 1, alpha_text));
+    ImPlot::PlotScatter("Point", &x, &y, 1);
+    
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, alpha_text));
+    ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(1, 19));
+    ImGui::PopStyleColor();
+
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, alpha_text));
+    ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(0, 18));
+    ImGui::PopStyleColor();
+    
+    }
+  }
 
     ImPlot::EndPlot();
   }

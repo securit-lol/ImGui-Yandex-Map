@@ -1,11 +1,12 @@
 #pragma once
 #include <string>
-#include <forward_list>
-#include <list>
+#include <vector>
 #include <chrono>
 #include <format>
 #include <nlohmann/json.hpp>
 #include <cpr/cpr.h>
+
+const std::string kApiKey = "";
 
 template<typename Key, typename Value>
 class DeadthMap {
@@ -46,7 +47,6 @@ public:
 };
 
 namespace api {
-    static bool active = true;
     std::string GetCurrentDate();
 
     struct City {
@@ -56,6 +56,8 @@ namespace api {
         std::string yandex_code;
         std::string title;
         std::string owner_title = "";
+
+        static City from_json(const nlohmann::json& j);
     };
 
     struct Station {
@@ -75,27 +77,23 @@ namespace api {
         float longitude = 0.0f;
         std::string title;
         std::string yandex_code;
-        std::forward_list<Station> stations;
+        std::vector<Station> stations;
 
         static Lement from_json(const nlohmann::json& j);
     };
 
     struct Region {
-        int lements_count = 0;
-        float latitude = 0.0f;
-        float longitude = 0.0f;
         std::string title;
         std::string yandex_code;
-        std::forward_list<Lement> settlements;
+        std::vector<Lement> settlements;
 
         static Region from_json(const nlohmann::json& j);
     };
 
     struct Country {
-        int max_stations_count = 0;
         std::string title;
         std::string yandex_code;
-        std::forward_list<Region> regions;
+        std::vector<Region> regions;
 
         static Country from_json(const nlohmann::json& j);
     };
@@ -146,24 +144,24 @@ namespace api {
             std::string arrival;
             Location departure_from;
             Location arrival_to;
-            std::list<Detail> details;
+            std::vector<Detail> details;
         };
 
         Search search;
-        std::list<Segment> segments;
+        std::vector<Segment> segments;
     };
 
     namespace data {
-        extern const std::string kApiKey;
-        extern std::forward_list<Country> all_country_data;
-        extern ScheduleResponse schedule_response;
+        extern std::vector<Country> all_country_data;
 
-        extern const api::Region* seek_region;
-        extern const api::Lement* lement_1;
-        extern const api::Lement* lement_2;
+        extern std::mutex way_mtx;
+        extern ScheduleResponse way_data;
 
-        extern api::City near_city_1;
-        extern api::City near_city_2;
+        extern std::mutex city_mtx;
+        extern std::unique_ptr<const api::City> near_city_1;
+        extern std::unique_ptr<const api::City> near_city_2;
+
+        extern bool switcher;
     }
     template<typename T>
     bool TryGetValue(const nlohmann::json& j, const std::string& key, T& target);
@@ -171,10 +169,8 @@ namespace api {
     std::string GetCurrentDate();
     void GetAllStations();
     void UpdateStatus();
-    City GetNearestCity(const Lement& lement, float distance);
-    //ScheduleResponse GetWay(const api::City& fromCity, const api::City& toCity, const std::string& date);
-    void AddTask(const std::string& fromCity, const std::string& toCity, const std::string& date);
-    void ApiWorker();
+    std::unique_ptr<const City> GetNearestCity(const Lement& lement, float distance);
+    ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date);
 }
 
 template<typename T>

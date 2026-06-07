@@ -1,17 +1,11 @@
 #include "YandexData.h"
 #include <iostream>
 #include <format>
-
 #include <string>
 #include <chrono>
-template<typename T>
-T Max(const T& a, const T& b) {
-    return (a > b) ? a : b;
-}
 
 
 namespace api {
-
     void TryGetYandexCode(const nlohmann::json& j, std::string& target) {
         if (j.contains("codes") && j["codes"].is_object()) {
             const auto& codes = j["codes"];
@@ -24,12 +18,10 @@ namespace api {
     std::string GetCurrentDate() {
         auto now = std::chrono::system_clock::now();
         auto today = std::chrono::floor<std::chrono::days>(now);
-
         return std::format("{:%Y-%m-%d}", today);
     }
     
     DeadthMap<std::string, ScheduleResponse> cache = DeadthMap<std::string, ScheduleResponse>(1000);
-    
 
     Station Station::from_json(const nlohmann::json& j) {
         Station s;
@@ -71,49 +63,38 @@ namespace api {
         return s;
     }
 
-    namespace data {
-        const std::string kApiKey = "";
-        std::forward_list<Country> all_country_data = {};
-        ScheduleResponse schedule_response = {};
-
-        const api::Region* seek_region = nullptr;
-        const api::Lement* lement_1 = nullptr;
-        const api::Lement* lement_2 = nullptr;
-
-        api::City near_city_1 = api::City();
-        api::City near_city_2 = api::City();
+    City City::from_json(const nlohmann::json& j) {
+        City result;
+        TryGetValue(j, "title", result.title);
+        TryGetValue(j, "distance", result.distance);
+        TryGetValue(j, "lat", result.latitude);
+        TryGetValue(j, "lng", result.longitude);
+        TryGetValue(j, "code", result.yandex_code);
+        return result;
     }
 
-    void UpdateStatus() {
-        if (api::data::lement_1 && !api::data::lement_1->title.empty() && api::data::lement_1->title != api::data::near_city_1.owner_title) {
-            api::data::near_city_1 = api::GetNearestCity(*api::data::lement_1, 50);
-            api::data::near_city_1.owner_title = api::data::lement_1->title;
-        }
-        if (api::data::lement_2 && !api::data::lement_2->title.empty() && api::data::lement_2->title != api::data::near_city_2.owner_title) {
-            api::data::near_city_2 = api::GetNearestCity(*api::data::lement_2, 50);
-            api::data::near_city_2.owner_title = api::data::lement_2->title;
-        }
+
+    namespace data {
+        std::vector<Country> all_country_data = {};
+        ScheduleResponse way_data = {};
+        std::unique_ptr<const api::City> near_city_1 = nullptr;
+        std::unique_ptr<const api::City> near_city_2 = nullptr;
+        std::mutex way_mtx = {};
+        std::mutex city_mtx = {};
+        bool switcher = false;
     }
 
     void GetAllStations() {
-        
-        if (data::kApiKey.size()  == 0) {
-
-            std::cout << "ApiKey is empty, please setup kApiKey in YandexApi/YandexData.cpp" << std::endl;
-            std::abort();
-        }
-        std::cout << "Getting all stations data, please - wait..." << std::endl;
         std::string url = "https://api.rasp.yandex-net.ru/v3.0/stations_list/";
         cpr::Parameters parameters = {
-            {"apikey", data::kApiKey},
+            {"apikey", kApiKey},
             {"format", "json"},
             {"lang", "ru_RU"}
         };
 
         cpr::Response response = cpr::Get(cpr::Url{ url }, parameters);
-        printf("Status: %ld\n", response.status_code);
         if (response.status_code != 200) {
-            std::cout << "Error!" << std::endl;
+            std::cout << "Error getting all stations" << std::endl;
             return;
         }
 
@@ -135,7 +116,7 @@ namespace api {
                             st_type == "station" || st_type == "train_station" || st_type == "airport" || st_type == "bus_station" || st_type == "bus_stop") {
                             Station _station = Station::from_json(station);
 
-                            _lement.stations.push_front(_station);
+                            _lement.stations.push_back(_station);
                             _lement.stations_count += 1;
                             _lement.latitude += _station.latitude;
                             _lement.longitude += _station.longitude;
@@ -145,27 +126,18 @@ namespace api {
                         _lement.latitude /= _lement.stations_count;
                         _lement.longitude /= _lement.stations_count;
                     }
-                    _country.max_stations_count = Max(_country.max_stations_count, _lement.stations_count);
-                    _region.settlements.push_front(_lement);
-                    _region.lements_count += 1;
-                    _region.latitude += _lement.latitude;
-                    _region.longitude += _lement.longitude;
+                    _region.settlements.push_back(_lement);
                 }
-                if (_region.lements_count) {
-                    _region.latitude /= _region.lements_count;
-                    _region.longitude /= _region.lements_count;
-                }
-                _country.regions.push_front(_region);
+                _country.regions.push_back(_region);
             }
-            data::all_country_data.push_front(_country);
+            data::all_country_data.push_back(_country);
         }
     }
 
-    City GetNearestCity(const Lement& lement, float distance) {
-        std::cout << "Getting nearest city, please - wait..." << std::endl;
+    std::unique_ptr<const City> GetNearestCity(const Lement& lement, float distance) {
         std::string url = "https://api.rasp.yandex-net.ru/v3.0/nearest_settlement/";
         cpr::Parameters parameters = {
-            {"apikey", data::kApiKey},
+            {"apikey", kApiKey},
             {"format", "json"},
             {"lang", "ru_RU"},
             {"lat", std::to_string(lement.latitude)},
@@ -174,36 +146,23 @@ namespace api {
         };
 
         cpr::Response response = cpr::Get(cpr::Url{ url }, parameters);
-        printf("Status: %ld\n", response.status_code);
         if (response.status_code == 404) {
-            std::cout << "Error!" << std::endl;
-            return {};
+            std::cout << "Error getting nearest city" << std::endl;
+            return nullptr;
         }
 
         nlohmann::json json_data = nlohmann::json::parse(response.text);
 
-        City result;
-        TryGetValue(json_data, "title", result.title);
-        TryGetValue(json_data, "distance", result.distance);
-        TryGetValue(json_data, "lat", result.latitude);
-        TryGetValue(json_data, "lng", result.longitude);
-        TryGetValue(json_data, "code", result.yandex_code);
+        std::unique_ptr<City> result = std::make_unique<City>(City::from_json(json_data));
+        result->owner_title = lement.title;
         return result;
     }
-    struct Way {
-        std::string fromCity;
-        std::string toCity;
-        std::string date;
-    };
-
-    
 
 
     ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date) {
-        std::cout << "Getting schedule from " << fromCity << " to " << toCity << ", please wait..." << std::endl;
         std::string url = "https://api.rasp.yandex-net.ru/v3.0/search/";
         cpr::Parameters parameters = {
-            {"apikey", api::data::kApiKey},
+            {"apikey", kApiKey},
             {"format", "json"},
             {"lang", "ru_RU"},
             {"from", fromCity},
@@ -224,16 +183,13 @@ namespace api {
 
         cpr::Response response = cpr::Get(cpr::Url{ url }, parameters);
 
-        printf("Status: %ld\n", response.status_code);
 
         if (response.status_code != 200) {
-            std::cout << "Error!" << std::endl;
+            std::cout << "Error getting way" << std::endl;
             return {};
         }
 
         nlohmann::json json_data = nlohmann::json::parse(response.text);
-
-        
 
         if (json_data.contains("segments") && json_data["segments"].is_array()) {
             for (const auto& item : json_data["segments"]) {
@@ -348,14 +304,7 @@ namespace api {
             }
         }
         cache.insert(map_key, result);
-
-        std::cout << "Cache Added" << std::endl;
         return result;
-    }
-
-    void AddTask(const std::string& fromCity, const std::string& toCity, const std::string& date) {
-        if (!fromCity.empty() && !toCity.empty()&& !date.empty()) 
-            data::schedule_response = GetWay(fromCity, toCity, date);
     }
 } // namespace api
 

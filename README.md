@@ -2,11 +2,13 @@
 An interactive map application built with ImGui and ImOsmWidget.
 
 This fork enhances the original demo by integrating Yandex Schedule API, allowing users to visualize transport stations and build routes directly on the map.
+Route searches and all interactions with the Yandex API are performed on a separate background thread. This ensures that the main GUI thread remains responsive and smooth even during network requests or complex data processing.
 
 ## Screenshots
 
+![image2](doc/show2.gif)
 ![image1](doc/show1.png)
-![image2](doc/show2.png)
+
 
 ## Ubuntu dependencies
 

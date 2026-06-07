@@ -9,12 +9,12 @@
 #include <ImOsmTileDummy.h>
 #include <ImOsmTileGrabber.h>
 #include <ImOsmTileGrabberUrl.h>
-#include <ImOsmTileGrabberWidget.h>
+//#include <ImOsmTileGrabberWidget.h>
 #include <ImOsmTileLoader.h>
 #include <ImOsmTileLoaderUrl.h>
 #include <ImOsmTileSaver.h>
 #include <ImOsmTileSourceAsync.h>
 #include <ImOsmTileSourceUrl.h>
 #include <ImOsmTileSourceUrlImpl.h>
-#include <ImOsmTileSourceWidget.h>
+//#include <ImOsmTileSourceWidget.h>
 #include <ImOsmTileTexture.h>
