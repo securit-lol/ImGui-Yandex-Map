@@ -50,6 +50,15 @@ const api::Lement* getNearLement(const ImVec2&  mouse_pos) {
 }
 
 
+void UpdateWay() {
+    if (api::data::near_city_1 && api::data::near_city_2 &&
+        api::data::near_city_1->yandex_code[0] == 'c' && api::data::near_city_2->yandex_code[0] == 'c' && 
+        api::data::near_city_1->yandex_code != api::data::near_city_2->yandex_code) {
+        std::lock_guard<std::mutex> lock(api::data::way_mtx);
+        api::data::way_data = api::GetWay(api::data::near_city_1->yandex_code, api::data::near_city_2->yandex_code, api::GetCurrentDate());
+    }
+}
+
 void UpdateCity(const api::Lement* nearest_point) {
     std::lock_guard<std::mutex> lock(api::data::city_mtx);
     std::unique_ptr<const api::City> nearest_city = std::move(api::GetNearestCity(*nearest_point, 50));
@@ -62,21 +71,12 @@ void UpdateCity(const api::Lement* nearest_point) {
             }
             api::data::switcher = !api::data::switcher;
         }
+        UpdateWay();
 }
 
 void CityNamer(const ImVec2&  mouse_pos) {
-    {
         const api::Lement* nearest_point = getNearLement(mouse_pos);
         UpdateCity(nearest_point);
-    }
-    
-
-    if (api::data::near_city_1 && api::data::near_city_2 &&
-        api::data::near_city_1->yandex_code[0] == 'c' && api::data::near_city_2->yandex_code[0] == 'c' && 
-        api::data::near_city_1->yandex_code != api::data::near_city_2->yandex_code) {
-        std::lock_guard<std::mutex> lock(api::data::way_mtx);
-        api::data::way_data = api::GetWay(api::data::near_city_1->yandex_code, api::data::near_city_2->yandex_code, api::GetCurrentDate());
-    }
 }
 
 void WorkerThread::CheckNearCity(const ImVec2& mouse_pos) {
