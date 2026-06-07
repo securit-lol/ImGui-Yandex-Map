@@ -81,7 +81,7 @@ namespace api {
         std::unique_ptr<const api::City> near_city_2 = nullptr;
         std::mutex way_mtx = {};
         std::mutex city_mtx = {};
-        bool switcher = false;
+        bool switcher = true;
     }
 
     void GetAllStations() {
