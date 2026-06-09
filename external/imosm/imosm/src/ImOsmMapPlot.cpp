@@ -5,144 +5,143 @@
 #include <implot.h>
 
 namespace ImOsm {
-MapPlot::MapPlot() : _loader{std::make_shared<TileLoaderOsmMap>()} {
-}
+  MapPlot::MapPlot()
+      : _loader { std::make_shared<TileLoaderOsmMap>() }
+  {
+  }
 
-MapPlot::MapPlot(std::shared_ptr<ITileLoader> &loader) : _loader{loader} {
-  resetBounds();
-}
+  MapPlot::MapPlot(std::shared_ptr<ITileLoader>& loader)
+      : _loader { loader }
+  {
+    resetBounds();
+  }
 
-void MapPlot::paint() {
-  if (ImPlot::BeginPlot("##ImOsmMapPlot", {-1, -1}, _plotFlags)) {
+  void MapPlot::paint()
+  {
+    if (ImPlot::BeginPlot("##ImOsmMapPlot", { -1, -1 }, _plotFlags)) {
 
-    ImPlot::SetupAxis(ImAxis_X1, nullptr, _xFlags);
-    ImPlot::SetupAxis(ImAxis_Y1, nullptr, _yFlags);
-    ImPlot::SetupAxisLimitsConstraints(ImAxis_Y1, 0.0, 1.0);
+      ImPlot::SetupAxis(ImAxis_X1, nullptr, _xFlags);
+      ImPlot::SetupAxis(ImAxis_Y1, nullptr, _yFlags);
+      ImPlot::SetupAxisLimitsConstraints(ImAxis_Y1, 0.0, 1.0);
 
-    if (_setBounds != SetBounds::None) {
-      if (_setBounds == SetBounds::Geo) {
-        _minX = lon2x(_minLon, 0);
-        _maxX = lon2x(_maxLon, 0);
-        _minY = lat2y(_minLat, 0);
-        _maxY = lat2y(_maxLat, 0);
-      } else if (_setBounds == SetBounds::Local) {
-        // do nothing
+      if (_setBounds != SetBounds::None) {
+        if (_setBounds == SetBounds::Geo) {
+          _minX = lon2x(_minLon, 0);
+          _maxX = lon2x(_maxLon, 0);
+          _minY = lat2y(_minLat, 0);
+          _maxY = lat2y(_maxLat, 0);
+        } else if (_setBounds == SetBounds::Local) {
+          // do nothing
+        }
+        ImPlot::SetupAxisLimits(ImAxis_X1, _minX, _maxX, ImPlotCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, _minY, _maxY, ImPlotCond_Always);
+        _setBounds = SetBounds::None;
       }
-      ImPlot::SetupAxisLimits(ImAxis_X1, _minX, _maxX, ImPlotCond_Always);
-      ImPlot::SetupAxisLimits(ImAxis_Y1, _minY, _maxY, ImPlotCond_Always);
-      _setBounds = SetBounds::None;
-    }
 
-    ImPlot::SetupFinish();
+      ImPlot::SetupFinish();
 
-    _mousePos = ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
-    _plotLims = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
-    _plotSize = ImPlot::GetPlotSize();
+      _mousePos = ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
+      _plotLims = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+      _plotSize = ImPlot::GetPlotSize();
 
-    _mouseLon = x2lon(_mousePos.x, 0);
-    _mouseLat = y2lat(_mousePos.y, 0);
+      _mouseLon = x2lon(_mousePos.x, 0);
+      _mouseLat = y2lat(_mousePos.y, 0);
 
-    _pixelsX = _plotSize.x;
-    _pixelsY = _plotSize.y;
+      _pixelsX = _plotSize.x;
+      _pixelsY = _plotSize.y;
 
-    _minX = _plotLims.X.Min;
-    _maxX = _plotLims.X.Max;
-    _minY = _plotLims.Y.Min;
-    _maxY = _plotLims.Y.Max;
-    _rangeX = fabs(_maxX - _minX);
-    _rangeY = fabs(_maxY - _minY);
+      _minX = _plotLims.X.Min;
+      _maxX = _plotLims.X.Max;
+      _minY = _plotLims.Y.Min;
+      _maxY = _plotLims.Y.Max;
+      _rangeX = fabs(_maxX - _minX);
+      _rangeY = fabs(_maxY - _minY);
 
-    _resX = _pixelsX / _rangeX;
-    _resY = _pixelsY / _rangeY;
-    _zoom = std::clamp(int(floor(log2(_resX / _tilePixels))), MinZoom, MaxZoom);
-    
-    float zoomContinuous = log2(_resX / _tilePixels);
-    _cur_zoom = std::clamp(zoomContinuous, (float)MinZoom, (float)MaxZoom);
+      _resX = _pixelsX / _rangeX;
+      _resY = _pixelsY / _rangeY;
+      _zoom = std::clamp(int(floor(log2(_resX / _tilePixels))), MinZoom, MaxZoom);
 
-    _tilesNum = POW2[_zoom];
-    _tileSize = 1.0 / float(_tilesNum);
+      float zoomContinuous = log2(_resX / _tilePixels);
+      _cur_zoom = std::clamp(zoomContinuous, (float)MinZoom, (float)MaxZoom);
 
-    const auto minMaxLat{std::minmax(y2lat(_minY * _tilesNum, _zoom),
-                                     y2lat(_maxY * _tilesNum, _zoom))};
-    const auto minMaxLon{std::minmax(x2lon(_minX * _tilesNum, _zoom),
-                                     x2lon(_maxX * _tilesNum, _zoom))};
+      _tilesNum = POW2[_zoom];
+      _tileSize = 1.0 / float(_tilesNum);
 
-    _minLat = minMaxLat.first;
-    _maxLat = minMaxLat.second;
-    _minLon = minMaxLon.first;
-    _maxLon = minMaxLon.second;
+      const auto minMaxLat { std::minmax(y2lat(_minY * _tilesNum, _zoom),
+          y2lat(_maxY * _tilesNum, _zoom)) };
+      const auto minMaxLon { std::minmax(x2lon(_minX * _tilesNum, _zoom),
+          x2lon(_maxX * _tilesNum, _zoom)) };
 
-    _minTX = std::clamp(int(_minX * _tilesNum), 0, _tilesNum - 1);
-    _maxTX = std::clamp(int(_maxX * _tilesNum), 0, _tilesNum - 1);
-    _minTY = std::clamp(int(_minY * _tilesNum), 0, _tilesNum - 1);
-    _maxTY = std::clamp(int(_maxY * _tilesNum), 0, _tilesNum - 1);
+      _minLat = minMaxLat.first;
+      _maxLat = minMaxLat.second;
+      _minLon = minMaxLon.first;
+      _maxLon = minMaxLon.second;
 
-    _loader->beginLoad(_zoom, _minTX, _maxTX, _minTY, _maxTY);
+      _minTX = std::clamp(int(_minX * _tilesNum), 0, _tilesNum - 1);
+      _maxTX = std::clamp(int(_maxX * _tilesNum), 0, _tilesNum - 1);
+      _minTY = std::clamp(int(_minY * _tilesNum), 0, _tilesNum - 1);
+      _maxTY = std::clamp(int(_maxY * _tilesNum), 0, _tilesNum - 1);
 
-    ImVec2 bmin{float(_minTX), float(_minTY)};
-    ImVec2 bmax{float(_maxTX), float(_maxTY)};
+      _loader->beginLoad(_zoom, _minTX, _maxTX, _minTY, _maxTY);
 
-    for (auto x{_minTX}; x != _maxTX + 1; ++x) {
-      bmin.x = float(x) * _tileSize;
-      bmax.x = float(x + 1) * _tileSize;
-      for (auto y{_minTY}; y != _maxTY + 1; ++y) {
-        bmin.y = float(y) * _tileSize;
-        bmax.y = float(y + 1) * _tileSize;
-        ImPlot::PlotImage("##", _loader->tileAt(_zoom, x, y), bmin, bmax, _uv0,
-                          _uv1, _tint);
+      ImVec2 bmin { float(_minTX), float(_minTY) };
+      ImVec2 bmax { float(_maxTX), float(_maxTY) };
+
+      for (auto x { _minTX }; x != _maxTX + 1; ++x) {
+        bmin.x = float(x) * _tileSize;
+        bmax.x = float(x + 1) * _tileSize;
+        for (auto y { _minTY }; y != _maxTY + 1; ++y) {
+          bmin.y = float(y) * _tileSize;
+          bmax.y = float(y + 1) * _tileSize;
+          ImPlot::PlotImage("##", _loader->tileAt(_zoom, x, y), bmin, bmax, _uv0,
+              _uv1, _tint);
+        }
       }
-    }
 
-    _loader->endLoad();
+      _loader->endLoad();
 
-    float alpha_dot = 0.01f;
-    float alpha_text = 0.0f;
+      float alpha_dot = 0.01f;
+      float alpha_text = 0.0f;
 
-    if (_cur_zoom < 4.0f) {
+      if (_cur_zoom < 4.0f) {
         alpha_dot = 0.01f;
-    } 
-    else if (_cur_zoom >= 4.0f && _cur_zoom < 8.0f) {
+      } else if (_cur_zoom >= 4.0f && _cur_zoom < 8.0f) {
         float t = (_cur_zoom - 4.0f) / (8.0f - 4.0f);
-         alpha_dot = 0.01f + t * 0.99f;
-    } 
-    else {
+        alpha_dot = 0.01f + t * 0.99f;
+      } else {
         alpha_dot = 1.0f;
-    }
+      }
 
-    if (_cur_zoom < 6.0f) {
+      if (_cur_zoom < 6.0f) {
         alpha_text = 0.0f;
-    } 
-    else if (_cur_zoom >= 6.0f && _cur_zoom < 10.0f) {
+      } else if (_cur_zoom >= 6.0f && _cur_zoom < 10.0f) {
         float t = (_cur_zoom - 6.0f) / (10.0f - 6.0f);
-         alpha_text = t * 1.f;
-    } 
-    else {
+        alpha_text = t * 1.f;
+      } else {
         alpha_text = 1.0f;
-    }
+      }
 
-    const std::vector<std::pair<std::string,OsmCoords>>* dots = getPoints();
-    if (dots && alpha_dot > 0.0f) {
-      
-      
-    for (auto _obj :  *dots) {
-        double x = _obj.second.x;
-        double y = _obj.second.y;
-    
-    ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 7.0f, ImVec4(0, 0, 0, alpha_dot), 1.5f, ImVec4(1, 1, 1, alpha_text));
-    ImPlot::PlotScatter("Point", &x, &y, 1);
-    
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, alpha_text));
-    ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(1, 19));
-    ImGui::PopStyleColor();
+      const std::vector<std::pair<std::string, OsmCoords>>* dots = getPoints();
+      if (dots && alpha_dot > 0.0f) {
 
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, alpha_text));
-    ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(0, 18));
-    ImGui::PopStyleColor();
-    
+        for (auto _obj : *dots) {
+          double x = _obj.second.x;
+          double y = _obj.second.y;
+
+          ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 7.0f, ImVec4(0, 0, 0, alpha_dot), 1.5f, ImVec4(1, 1, 1, alpha_text));
+          ImPlot::PlotScatter("Point", &x, &y, 1);
+
+          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, alpha_text));
+          ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(1, 19));
+          ImGui::PopStyleColor();
+
+          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, alpha_text));
+          ImPlot::PlotText(_obj.first.c_str(), x, y, ImVec2(0, 18));
+          ImGui::PopStyleColor();
+        }
+      }
+
+      ImPlot::EndPlot();
     }
   }
-
-    ImPlot::EndPlot();
-  }
-}
 } // namespace ImOsm
