@@ -100,10 +100,10 @@ void ImOsmDemoApp::paint()
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
   if (worker->near_city_1.get())
-    ImGui::Text(("Point 1: " + worker->near_city_1->title + " (code: " + worker->near_city_1->yandex_code + ")").c_str());
+    ImGui::Text("%s", ("Point 1: " + worker->near_city_1->title + " (code: " + worker->near_city_1->yandex_code + ")").c_str());
 
   if (worker->near_city_2.get())
-    ImGui::Text(("Point 2: " + worker->near_city_2->title + " (code: " + worker->near_city_2->yandex_code + ")").c_str());
+    ImGui::Text("%s", ("Point 2: " + worker->near_city_2->title + " (code: " + worker->near_city_2->yandex_code + ")").c_str());
 
   ImGui::Separator();
 
