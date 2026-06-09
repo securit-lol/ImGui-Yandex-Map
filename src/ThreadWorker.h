@@ -1,5 +1,6 @@
 #pragma once
 
+#include "YandexApi/YandexData.h"
 #include <condition_variable>
 #include <functional>
 #include <memory>
@@ -11,28 +12,44 @@ namespace ImOsm {
   class MapPlot;
 }
 
-namespace api {
-  class Lement;
-}
 struct ImVec2;
-class WorkerThread {
+
+namespace ya_data {
+  class Lement;
+  struct City;
+  struct Country;
+  struct ScheduleResponse;
+} // namespace ya_data
+
+class ThreadWorker {
   public:
-  explicit WorkerThread(const std::shared_ptr<ImOsm::MapPlot>& mapPlotPtr);
-  ~WorkerThread();
+  explicit ThreadWorker(const std::shared_ptr<ImOsm::MapPlot>& mapPlotPtr);
+  ~ThreadWorker();
 
-  WorkerThread(const WorkerThread&) = delete;
-  WorkerThread& operator=(const WorkerThread&) = delete;
+  ThreadWorker(const ThreadWorker&) = delete;
+  ThreadWorker& operator=(const ThreadWorker&) = delete;
+  ThreadWorker(ThreadWorker&&) = delete;
+  ThreadWorker& operator=(ThreadWorker&&) = delete;
 
-  WorkerThread(WorkerThread&&) = delete;
-  WorkerThread& operator=(WorkerThread&&) = delete;
+  void GetAllStations();
+  std::unique_ptr<const ya_data::City> GetNearestCity(const ya_data::Lement& lement, float distance);
+  ya_data::ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date);
 
-  void execute(std::function<void()> task);
+  std::vector<ya_data::Country> all_country_data = { };
+  ya_data::ScheduleResponse way_data = { };
+  std::mutex way_mtx = { };
+  std::mutex city_mtx = { };
+  std::unique_ptr<const ya_data::City> near_city_1 = nullptr;
+  std::unique_ptr<const ya_data::City> near_city_2 = nullptr;
 
   void CheckNearCity(const ImVec2&);
-  void UpdateNearCity(const api::Lement*);
+  void UpdateNearCity(const ya_data::Lement*);
+  void execute(std::function<void()> task);
 
   private:
+  bool switcher = true;
   void threadFunction(std::shared_ptr<ImOsm::MapPlot> mapPlot);
+  std::string GetCurrentDate();
 
   std::thread worker;
   std::mutex mtx;
@@ -40,4 +57,7 @@ class WorkerThread {
   std::queue<std::function<void()>> tasks;
   bool stop = false;
   bool hasWork = false;
+
+  cpr::Session session;
+  DeadthMap<std::string, ya_data::ScheduleResponse> cache;
 };

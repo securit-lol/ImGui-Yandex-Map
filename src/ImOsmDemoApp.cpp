@@ -11,7 +11,7 @@ ImOsmDemoApp::ImOsmDemoApp()
     : ImApp::MainWindow("ImGui Yandex Map")
     , _mapPlot { std::make_shared<ImOsm::MapPlot>() }
 {
-  worker = std::make_unique<WorkerThread>(_mapPlot);
+  worker = std::make_unique<ThreadWorker>(_mapPlot);
 }
 
 ImOsmDemoApp::~ImOsmDemoApp() { }
@@ -40,15 +40,15 @@ void ImOsmDemoApp::firstPaint()
 
 #include <limits>
 
-std::vector<const api::Lement*> Search(const std::string& prefix)
+static std::vector<const ya_data::Lement*> Search(ThreadWorker& api, const std::string& prefix)
 {
-  std::vector<const api::Lement*> result;
+  std::vector<const ya_data::Lement*> result;
 
   if (prefix.empty()) {
     return result;
   }
 
-  for (const auto& __country : api::data::all_country_data) {
+  for (const auto& __country : api.all_country_data) {
     for (const auto& __region : __country.regions) {
       for (const auto& __lement : __region.settlements) {
         if (__lement.title.length() < prefix.length()) {
@@ -99,31 +99,31 @@ void ImOsmDemoApp::paint()
   ImGui::Begin("WayInfo", nullptr,
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
-  if (api::data::near_city_1.get())
-    ImGui::Text(("Point 1: " + api::data::near_city_1->title + " (code: " + api::data::near_city_1->yandex_code + ")").c_str());
+  if (worker->near_city_1.get())
+    ImGui::Text(("Point 1: " + worker->near_city_1->title + " (code: " + worker->near_city_1->yandex_code + ")").c_str());
 
-  if (api::data::near_city_2.get())
-    ImGui::Text(("Point 2: " + api::data::near_city_2->title + " (code: " + api::data::near_city_2->yandex_code + ")").c_str());
+  if (worker->near_city_2.get())
+    ImGui::Text(("Point 2: " + worker->near_city_2->title + " (code: " + worker->near_city_2->yandex_code + ")").c_str());
 
   ImGui::Separator();
 
-  if (api::data::near_city_1.get() && api::data::near_city_2.get() && !api::data::way_data.search.from.title.empty() && !api::data::way_data.search.to.title.empty()) {
-    std::lock_guard<std::mutex> lock(api::data::way_mtx);
+  if (worker->near_city_1.get() && worker->near_city_2.get() && !worker->way_data.search.from.title.empty() && !worker->way_data.search.to.title.empty()) {
+    std::lock_guard<std::mutex> lock(worker->way_mtx);
     ImGui::Text("Откуда: %s (%s)",
-        api::data::way_data.search.from.title.c_str(),
-        api::data::way_data.search.from.code.c_str());
-    ImGui::Text("Куда: %s (%s)", api::data::way_data.search.to.title.c_str(),
-        api::data::way_data.search.to.code.c_str());
-    ImGui::Text("Дата: %s", api::data::way_data.search.date.c_str());
-    ImGui::Text("Кол-во путей: %d", api::data::way_data.segments.size());
+        worker->way_data.search.from.title.c_str(),
+        worker->way_data.search.from.code.c_str());
+    ImGui::Text("Куда: %s (%s)", worker->way_data.search.to.title.c_str(),
+        worker->way_data.search.to.code.c_str());
+    ImGui::Text("Дата: %s", worker->way_data.search.date.c_str());
+    ImGui::Text("Кол-во путей: %d", (int)worker->way_data.segments.size());
 
-    if (!api::data::way_data.segments.empty()) {
+    if (!worker->way_data.segments.empty()) {
       int way_idx = 0;
-      for (const auto& segment : api::data::way_data.segments) {
+      for (const auto& segment : worker->way_data.segments) {
         if (segment.details.empty())
           continue;
 
-        ImGui::Text("\n--- Путь№ %zu ---", ++way_idx);
+        ImGui::Text("\n--- Путь %d ---", ++way_idx);
         ImGui::Text("Откуда: %s", segment.departure_from.title.c_str());
         ImGui::Text("Куда: %s", segment.arrival_to.title.c_str());
         ImGui::Text("Отправление: %s", segment.departure.c_str());
@@ -171,7 +171,7 @@ void ImOsmDemoApp::paint()
   }
   ImGui::End();
   static char search_buffer[128] = "";
-  static std::vector<const api::Lement*> search_results;
+  static std::vector<const ya_data::Lement*> search_results;
 
   ImGui::Begin("Data", nullptr,
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
@@ -179,7 +179,7 @@ void ImOsmDemoApp::paint()
   if (ImGui::InputText("Поиск", search_buffer, IM_ARRAYSIZE(search_buffer))) {
     search_results.clear();
     if (strlen(search_buffer) > 0) {
-      search_results = Search(search_buffer);
+      search_results = Search(*worker, search_buffer);
     }
   }
 
@@ -209,7 +209,7 @@ void ImOsmDemoApp::paint()
   ImGui::Separator();
   ImGui::Text("Все данные:");
 
-  for (const auto& __country : api::data::all_country_data) {
+  for (const auto& __country : worker->all_country_data) {
     if (ImGui::CollapsingHeader(__country.title.c_str())) {
       int reg_indx = 0;
       for (const auto& __region : __country.regions) {

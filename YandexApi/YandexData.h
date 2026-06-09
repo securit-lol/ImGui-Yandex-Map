@@ -8,11 +8,7 @@
 
 const std::string kApiKey = "70455551-06b9-4ac8-80b9-a34c2aac8c8e";
 
-namespace api {
-  extern cpr::Session session;
-  void SessionInit();
-
-  std::string GetCurrentDate();
+namespace ya_data {
 
   struct City {
     float distance = -1.0f;
@@ -104,7 +100,7 @@ namespace api {
     };
 
     struct Segment {
-      bool has_transfers;
+      bool has_transfers = false;
       std::string departure;
       std::string arrival;
       Location departure_from;
@@ -116,27 +112,38 @@ namespace api {
     std::vector<Segment> segments;
   };
 
-  namespace data {
-    extern std::vector<Country> all_country_data;
-
-    extern std::mutex way_mtx;
-    extern ScheduleResponse way_data;
-
-    extern std::mutex city_mtx;
-    extern std::unique_ptr<const api::City> near_city_1;
-    extern std::unique_ptr<const api::City> near_city_2;
-
-    extern bool switcher;
-  } // namespace data
-
   template <typename T>
   bool TryGetValue(const nlohmann::json& j, const std::string& key, T& target);
   void TryGetYandexCode(const nlohmann::json& j, std::string& target);
-  std::string GetCurrentDate();
-  void GetAllStations();
-  std::unique_ptr<const City> GetNearestCity(const Lement& lement, float distance);
-  ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date);
-} // namespace api
+
+} // namespace ya_data
+
+template <typename T>
+bool ya_data::TryGetValue(const nlohmann::json& j, const std::string& key, T& target)
+{
+  if (!j.contains(key))
+    return false;
+
+  const auto& value = j[key];
+
+  if constexpr (std::is_same_v<T, std::string>) {
+    if (value.is_string()) {
+      target = value.get<std::string>();
+      return true;
+    }
+  } else if constexpr (std::is_same_v<T, bool>) {
+    if (value.is_boolean()) {
+      target = value.get<bool>();
+      return true;
+    }
+  } else if constexpr (std::is_arithmetic_v<T>) {
+    if (value.is_number()) {
+      target = value.get<T>();
+      return true;
+    }
+  }
+  return false;
+}
 
 template <typename Key, typename Value>
 class DeadthMap {
@@ -181,30 +188,3 @@ class DeadthMap {
 
   size_t size() const { return data.size(); }
 };
-
-template <typename T>
-bool api::TryGetValue(const nlohmann::json& j, const std::string& key, T& target)
-{
-  if (!j.contains(key))
-    return false;
-
-  const auto& value = j[key];
-
-  if constexpr (std::is_same_v<T, std::string>) {
-    if (value.is_string()) {
-      target = value.get<std::string>();
-      return true;
-    }
-  } else if constexpr (std::is_same_v<T, bool>) {
-    if (value.is_boolean()) {
-      target = value.get<bool>();
-      return true;
-    }
-  } else if constexpr (std::is_arithmetic_v<T>) {
-    if (value.is_number()) {
-      target = value.get<T>();
-      return true;
-    }
-  }
-  return false;
-}

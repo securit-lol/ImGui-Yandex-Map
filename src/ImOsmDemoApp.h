@@ -21,7 +21,7 @@ class ImOsmDemoApp : public ImApp::MainWindow {
   void firstPaint() override;
   void paint() override;
 
-  std::unique_ptr<WorkerThread> worker;
+  std::unique_ptr<ThreadWorker> worker;
 
   private:
   std::shared_ptr<ImOsm::MapPlot> _mapPlot;
