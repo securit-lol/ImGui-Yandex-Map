@@ -19,23 +19,12 @@ add_library(logic_lib STATIC
 )
 
 find_package(Threads REQUIRED)
-find_package(LibXml2 REQUIRED)
 
 target_link_libraries(logic_lib
     PUBLIC
     cpr::cpr
     nlohmann_json::nlohmann_json
     ${CMAKE_THREAD_LIBS_INIT}
-)
-
-target_link_libraries(logic_lib
-    PUBLIC
-    idn2
-    unistring
-    psl
-    curl
-    ssl
-    crypto
 )
 
 target_include_directories(logic_lib

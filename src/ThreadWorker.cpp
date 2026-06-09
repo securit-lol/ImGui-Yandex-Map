@@ -2,6 +2,7 @@
 #include "ImOsmDemoApp.h"
 #include "YandexApi/YandexData.h"
 #include <imgui_internal.h>
+#include <iostream>
 
 ThreadWorker::ThreadWorker(const std::shared_ptr<ImOsm::MapPlot>& mapPlotPtr)
     : cache(1000)

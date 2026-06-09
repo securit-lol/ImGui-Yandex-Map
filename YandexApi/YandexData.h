@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-const std::string kApiKey = "70455551-06b9-4ac8-80b9-a34c2aac8c8e";
+const std::string kApiKey = "";
 
 namespace ya_data {
 

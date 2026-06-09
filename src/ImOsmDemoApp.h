@@ -1,7 +1,6 @@
 #pragma once
 #include <imapp.h>
 #include <imosm.h>
-#include <imwrap.h>
 
 #include "ThreadWorker.h"
 
