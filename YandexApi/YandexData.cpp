@@ -6,6 +6,13 @@
 
 
 namespace api {
+    cpr::Session session;
+    
+    void SessionInit() {
+        session.SetHeader(cpr::Header{{"User-Agent", "MyApp/1.0"}});
+        session.SetTimeout(cpr::Timeout{10000});
+    }
+
     void TryGetYandexCode(const nlohmann::json& j, std::string& target) {
         if (j.contains("codes") && j["codes"].is_object()) {
             const auto& codes = j["codes"];
@@ -85,14 +92,17 @@ namespace api {
     }
 
     void GetAllStations() {
-        std::string url = "https://api.rasp.yandex-net.ru/v3.0/stations_list/";
         cpr::Parameters parameters = {
             {"apikey", kApiKey},
             {"format", "json"},
             {"lang", "ru_RU"}
         };
 
-        cpr::Response response = cpr::Get(cpr::Url{ url }, parameters);
+        session.SetUrl(cpr::Url{"https://api.rasp.yandex-net.ru/v3.0/stations_list/"});
+        session.SetParameters(parameters);
+        session.SetBody(cpr::Body{""});
+
+        cpr::Response response = session.Get();
         if (response.status_code != 200) {
             std::cout << "Error getting all stations" << std::endl;
             return;
@@ -135,7 +145,6 @@ namespace api {
     }
 
     std::unique_ptr<const City> GetNearestCity(const Lement& lement, float distance) {
-        std::string url = "https://api.rasp.yandex-net.ru/v3.0/nearest_settlement/";
         cpr::Parameters parameters = {
             {"apikey", kApiKey},
             {"format", "json"},
@@ -145,7 +154,12 @@ namespace api {
             {"distance", std::to_string(distance)}
         };
 
-        cpr::Response response = cpr::Get(cpr::Url{ url }, parameters);
+        session.SetUrl(cpr::Url{"https://api.rasp.yandex-net.ru/v3.0/nearest_settlement/"});
+        session.SetParameters(parameters);
+        session.SetBody(cpr::Body{""});
+
+        cpr::Response response = session.Get();
+
         if (response.status_code == 404) {
             std::cout << "Error getting nearest city" << std::endl;
             return nullptr;
@@ -160,7 +174,15 @@ namespace api {
 
 
     ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date) {
-        std::string url = "https://api.rasp.yandex-net.ru/v3.0/search/";
+        std::string map_key = fromCity + "|" + toCity;
+
+        ScheduleResponse result;
+        
+        std::string day_now = GetCurrentDate();
+        if (cache.find(map_key, result) && result.search.date == day_now) {
+            return result;
+        }
+
         cpr::Parameters parameters = {
             {"apikey", kApiKey},
             {"format", "json"},
@@ -170,18 +192,12 @@ namespace api {
             {"transfers", "true"},
             { "date", date }
         };
-        
-        std::string map_key = fromCity + "|" + toCity;
 
-        ScheduleResponse result;
-        
-        //auto it = cache::data.find(map_key, result);
-        std::string day_now = GetCurrentDate();
-        if (cache.find(map_key, result) && result.search.date == day_now) {
-            return result;
-        }
+        session.SetUrl(cpr::Url{"https://api.rasp.yandex-net.ru/v3.0/search/"});
+        session.SetParameters(parameters);
+        session.SetBody(cpr::Body{""});
 
-        cpr::Response response = cpr::Get(cpr::Url{ url }, parameters);
+        cpr::Response response = session.Get();
 
 
         if (response.status_code != 200) {

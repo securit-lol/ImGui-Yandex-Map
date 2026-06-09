@@ -98,7 +98,7 @@ void WorkerThread::threadFunction(std::shared_ptr<ImOsm::MapPlot> mapPlot) {
         std::cout << "Wrong api key. Edit (kApiKey) in YandexApi->YandexData.h" << std::endl;
         return;
     }
-        
+    api::SessionInit();
     api::GetAllStations();
     for (const auto &country : api::data::all_country_data) {
         for (const auto &region : country.regions) {

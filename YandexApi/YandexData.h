@@ -8,45 +8,11 @@
 
 const std::string kApiKey = "";
 
-template<typename Key, typename Value>
-class DeadthMap {
-private:
-    std::map<Key, Value> data;
-    std::vector<Key> insertion_order;
-    size_t max_size;
-
-public:
-    DeadthMap(size_t max) : max_size(max) {}
-
-    void insert(const Key& key, const Value& value) {
-        auto it = data.find(key);
-
-        if (it != data.end()) {
-            it->second = value;
-            return;
-        }
-
-        if (data.size() >= max_size) {
-            Key oldest = insertion_order.front();
-            data.erase(oldest);
-            insertion_order.erase(insertion_order.begin());
-        }
-
-        data[key] = value;
-        insertion_order.push_back(key);
-    }
-
-    bool find(const Key& key, Value& value) const {
-        auto it = data.find(key);
-        if (it == data.end()) return false;
-        value = it->second;
-        return true;
-    }
-
-    size_t size() const { return data.size(); }
-};
 
 namespace api {
+    extern cpr::Session session;
+    void SessionInit();
+
     std::string GetCurrentDate();
 
     struct City {
@@ -163,15 +129,53 @@ namespace api {
 
         extern bool switcher;
     }
+
     template<typename T>
     bool TryGetValue(const nlohmann::json& j, const std::string& key, T& target);
     void TryGetYandexCode(const nlohmann::json& j, std::string& target);
     std::string GetCurrentDate();
     void GetAllStations();
-    void UpdateStatus();
     std::unique_ptr<const City> GetNearestCity(const Lement& lement, float distance);
     ScheduleResponse GetWay(const std::string& fromCity, const std::string& toCity, const std::string& date);
 }
+
+template<typename Key, typename Value>
+class DeadthMap {
+private:
+    std::map<Key, Value> data;
+    std::vector<Key> insertion_order;
+    size_t max_size;
+
+public:
+    DeadthMap(size_t max) : max_size(max) {}
+
+    void insert(const Key& key, const Value& value) {
+        auto it = data.find(key);
+
+        if (it != data.end()) {
+            it->second = value;
+            return;
+        }
+
+        if (data.size() >= max_size) {
+            Key oldest = insertion_order.front();
+            data.erase(oldest);
+            insertion_order.erase(insertion_order.begin());
+        }
+
+        data[key] = value;
+        insertion_order.push_back(key);
+    }
+
+    bool find(const Key& key, Value& value) const {
+        auto it = data.find(key);
+        if (it == data.end()) return false;
+        value = it->second;
+        return true;
+    }
+
+    size_t size() const { return data.size(); }
+};
 
 template<typename T>
 bool api::TryGetValue(const nlohmann::json& j, const std::string& key, T& target) {
